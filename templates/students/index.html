@@ -52,8 +52,18 @@
                         <td>
                             <div class="flex items-center gap-3">
                                 <div class="avatar placeholder">
-                                    <div class="bg-neutral text-neutral-content rounded-full w-10">
-                                        <span>{{ student.name|slice:":1" }}</span>
+                                    <div class="w-10 h-10 rounded-full overflow-hidden">
+                                        {% if student.picture %}
+                                            <img 
+                                                src="{{ student.picture.url }}" 
+                                                alt="{{ student.name }}" 
+                                                class="w-full h-full object-cover"
+                                            >
+                                        {% else %}
+                                            <div class="flex items-center justify-center w-full h-full bg-neutral text-neutral-content text-lg font-bold">
+                                                {{ student.name|first|upper }}
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 <div>

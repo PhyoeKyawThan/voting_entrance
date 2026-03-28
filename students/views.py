@@ -47,6 +47,10 @@ def edit_student_view(request: HttpRequest, student_id: str):
 
     if request.method == "POST":
         student.name = request.POST.get('name')
+        if request.FILES.get('edit_picture'):
+            if student.picture:
+                student.picture.delete(save=False)
+            student.picture = request.FILES.get('edit_picture')
         student.student_number = request.POST.get('student_number')
         student.roll_no = request.POST.get('roll_no')
         student.current_semester = request.POST.get('current_semester')

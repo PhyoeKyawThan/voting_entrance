@@ -20,7 +20,7 @@
             <div class="card-body items-center text-center">
                 <div class="avatar online mb-4">
                     <div class="w-32 rounded-xl ring ring-primary ring-offset-base-100 ring-offset-2">
-                        <img src="{{ student.picture_uri }}" alt="{{ student.name }}" onerror="this.src='https://ui-avatars.com/api/?name={{ student.name }}&background=6366f1&color=fff'" />
+                        <img src="{{ student.picture.url }}" alt="{{ student.name }}" onerror="this.src='https://ui-avatars.com/api/?name={{ student.name }}&background=6366f1&color=fff'" />
                     </div>
                 </div>
                 <h2 class="text-2xl font-bold">{{ student.name }}</h2>

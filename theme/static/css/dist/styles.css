@@ -1498,6 +1498,144 @@
     }
   }
   @layer daisyui.l1.l2.l3 {
+    .file-input {
+      cursor: pointer;
+      cursor: pointer;
+      border: var(--border) solid #0000;
+      display: inline-flex;
+      appearance: none;
+      align-items: center;
+      background-color: var(--color-base-100);
+      vertical-align: middle;
+      webkit-user-select: none;
+      user-select: none;
+      width: clamp(3rem, 20rem, 100%);
+      height: var(--size);
+      padding-inline-end: 0.75rem;
+      font-size: 0.875rem;
+      line-height: 2;
+      border-start-start-radius: var(--join-ss, var(--radius-field));
+      border-start-end-radius: var(--join-se, var(--radius-field));
+      border-end-start-radius: var(--join-es, var(--radius-field));
+      border-end-end-radius: var(--join-ee, var(--radius-field));
+      border-color: var(--input-color);
+      box-shadow: 0 1px var(--input-color) inset, 0 -1px oklch(100% 0 0 / calc(var(--depth) * 0.1)) inset;
+      --size: calc(var(--size-field, 0.25rem) * 10);
+      --input-color: var(--color-base-content);
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .file-input {
+        box-shadow: 0 1px color-mix(in oklab, var(--input-color) calc(var(--depth) * 10%), #0000) inset, 0 -1px oklch(100% 0 0 / calc(var(--depth) * 0.1)) inset;
+      }
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .file-input {
+        --input-color: color-mix(in oklab, var(--color-base-content) 20%, #0000);
+      }
+    }
+    .file-input::file-selector-button {
+      margin-inline-end: calc(0.25rem * 4);
+      cursor: pointer;
+      padding-inline: calc(0.25rem * 4);
+      webkit-user-select: none;
+      user-select: none;
+      height: calc(100% + var(--border) * 2);
+      margin-block: calc(var(--border) * -1);
+      margin-inline-start: calc(var(--border) * -1);
+      font-size: 0.875rem;
+      color: var(--btn-fg);
+      border-width: var(--border);
+      border-style: solid;
+      border-color: var(--btn-border);
+      border-start-start-radius: calc(var(--join-ss, var(--radius-field) - var(--border)));
+      border-end-start-radius: calc(var(--join-es, var(--radius-field) - var(--border)));
+      font-weight: 600;
+      background-color: var(--btn-bg);
+      background-size: calc(var(--noise) * 100%);
+      background-image: var(--btn-noise);
+      text-shadow: 0 0.5px oklch(1 0 0 / calc(var(--depth) * 0.15));
+      box-shadow: 0 0.5px 0 0.5px white inset, var(--btn-shadow);
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .file-input::file-selector-button {
+        box-shadow: 0 0.5px 0 0.5px color-mix( in oklab, color-mix(in oklab, white 30%, var(--btn-bg)) calc(var(--depth) * 20%), #0000 ) inset, var(--btn-shadow);
+      }
+    }
+    .file-input::file-selector-button {
+      --size: calc(var(--size-field, 0.25rem) * 10);
+      --btn-bg: var(--btn-color, var(--color-base-200));
+      --btn-fg: var(--color-base-content);
+      --btn-border: var(--btn-bg);
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .file-input::file-selector-button {
+        --btn-border: color-mix(in oklab, var(--btn-bg), #000 5%);
+      }
+    }
+    .file-input::file-selector-button {
+      --btn-shadow: 0 3px 2px -2px var(--btn-bg),
+        0 4px 3px -2px var(--btn-bg);
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .file-input::file-selector-button {
+        --btn-shadow: 0 3px 2px -2px color-mix(in oklab, var(--btn-bg) 30%, #0000),
+        0 4px 3px -2px color-mix(in oklab, var(--btn-bg) 30%, #0000);
+      }
+    }
+    .file-input::file-selector-button {
+      --btn-noise: var(--fx-noise);
+    }
+    .file-input:focus {
+      --input-color: var(--color-base-content);
+      box-shadow: 0 1px var(--input-color);
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .file-input:focus {
+        box-shadow: 0 1px color-mix(in oklab, var(--input-color) 10%, #0000);
+      }
+    }
+    .file-input:focus {
+      outline: 2px solid var(--input-color);
+      outline-offset: 2px;
+      isolation: isolate;
+    }
+    .file-input:has(> input[disabled]), .file-input:is(:disabled, [disabled]) {
+      cursor: not-allowed;
+      border-color: var(--color-base-200);
+      background-color: var(--color-base-200);
+    }
+    .file-input:has(> input[disabled])::placeholder, .file-input:is(:disabled, [disabled])::placeholder {
+      color: var(--color-base-content);
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .file-input:has(> input[disabled])::placeholder, .file-input:is(:disabled, [disabled])::placeholder {
+        color: color-mix(in oklab, var(--color-base-content) 20%, transparent);
+      }
+    }
+    .file-input:has(> input[disabled]), .file-input:is(:disabled, [disabled]) {
+      box-shadow: none;
+      color: var(--color-base-content);
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .file-input:has(> input[disabled]), .file-input:is(:disabled, [disabled]) {
+        color: color-mix(in oklch, var(--color-base-content) 20%, #0000);
+      }
+    }
+    .file-input:has(> input[disabled])::file-selector-button, .file-input:is(:disabled, [disabled])::file-selector-button {
+      cursor: not-allowed;
+      border-color: var(--color-base-200);
+      background-color: var(--color-base-200);
+      --btn-border: #0000;
+      --btn-noise: none;
+      --btn-fg: var(--color-base-content);
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .file-input:has(> input[disabled])::file-selector-button, .file-input:is(:disabled, [disabled])::file-selector-button {
+        --btn-fg: color-mix(in oklch, var(--color-base-content) 20%, #0000);
+      }
+    }
+  }
+  @layer daisyui.l1.l2.l3 {
     .textarea {
       border: var(--border) solid #0000;
       min-height: calc(0.25rem * 20);
@@ -1864,6 +2002,9 @@
   .mt-1 {
     margin-top: calc(var(--spacing) * 1);
   }
+  .mt-2 {
+    margin-top: calc(var(--spacing) * 2);
+  }
   .mt-4 {
     margin-top: calc(var(--spacing) * 4);
   }
@@ -1997,6 +2138,15 @@
       font-weight: 600;
     }
   }
+  @layer daisyui.l1.l2.l3 {
+    .mask {
+      display: inline-block;
+      vertical-align: middle;
+      mask-size: contain;
+      mask-repeat: no-repeat;
+      mask-position: center;
+    }
+  }
   .block {
     display: block;
   }
@@ -2061,6 +2211,9 @@
   }
   .h-8 {
     height: calc(var(--spacing) * 8);
+  }
+  .h-10 {
+    height: calc(var(--spacing) * 10);
   }
   .h-16 {
     height: calc(var(--spacing) * 16);
@@ -2216,6 +2369,9 @@
   .gap-y-6 {
     row-gap: calc(var(--spacing) * 6);
   }
+  .overflow-hidden {
+    overflow: hidden;
+  }
   .overflow-x-auto {
     overflow-x: auto;
   }
@@ -2341,8 +2497,16 @@
   .bg-white {
     background-color: var(--color-white);
   }
+  @layer daisyui.l1.l2 {
+    .mask-heart {
+      mask-image: url("data:image/svg+xml,%3csvg width='200' height='185' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M100 184.606a15.384 15.384 0 0 1-8.653-2.678C53.565 156.28 37.205 138.695 28.182 127.7 8.952 104.264-.254 80.202.005 54.146.308 24.287 24.264 0 53.406 0c21.192 0 35.869 11.937 44.416 21.879a2.884 2.884 0 0 0 4.356 0C110.725 11.927 125.402 0 146.594 0c29.142 0 53.098 24.287 53.4 54.151.26 26.061-8.956 50.122-28.176 73.554-9.023 10.994-25.383 28.58-63.165 54.228a15.384 15.384 0 0 1-8.653 2.673Z' fill='black' fill-rule='nonzero'/%3e%3c/svg%3e");
+    }
+  }
   .stroke-current {
     stroke: currentcolor;
+  }
+  .object-cover {
+    object-fit: cover;
   }
   .p-2 {
     padding: calc(var(--spacing) * 2);
@@ -2382,6 +2546,9 @@
   }
   .pt-6 {
     padding-top: calc(var(--spacing) * 6);
+  }
+  .pb-6 {
+    padding-bottom: calc(var(--spacing) * 6);
   }
   .pl-0 {
     padding-left: calc(var(--spacing) * 0);

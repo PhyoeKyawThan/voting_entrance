@@ -1,6 +1,13 @@
 from django.db import models
 import uuid
 
+from datetime import datetime
+
+def upload_to_unique(instance, filename):
+    ext = filename.split('.')[-1]
+    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+    return f"profiles/{instance.student_number}_{timestamp}.{ext}"
+
 
 class Student(models.Model):
     
@@ -12,7 +19,11 @@ class Student(models.Model):
 
     student_number = models.IntegerField(null=False)
     name = models.CharField(max_length=50)
-    picture_uri = models.CharField(max_length=255)
+    picture = models.ImageField(
+        upload_to=upload_to_unique,
+        blank=True,
+        null=True
+    )
     roll_no = models.CharField(max_length=10)
     current_semester = models.IntegerField()
     nrc = models.CharField(max_length=100)

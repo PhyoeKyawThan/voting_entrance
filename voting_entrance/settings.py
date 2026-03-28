@@ -97,6 +97,9 @@ LOGIN_REDIRECT_URL = '/dashboard'
 TAILWIND_APP_NAME = 'theme'
 
 INTERNAL_IPS = ["127.0.0.1"]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
