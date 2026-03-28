@@ -1,0 +1,226 @@
+{% load tailwind_tags %}
+<!doctype html>
+<html
+  lang="en"
+  x-data="{ 
+        darkMode: localStorage.getItem('dark') === 'true',
+        toggleDark() {
+            this.darkMode = !this.darkMode;
+            localStorage.setItem('dark', this.darkMode);
+        }
+      }"
+  :class="{ 'dark': darkMode }"
+  :data-theme="darkMode ? 'dark' : 'light'"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Smart Scan{% endblock %}</title>
+    {% tailwind_css %}
+    <style>
+      [x-cloak] {
+        display: none !important;
+      }
+      html.dark,
+      html {
+        transition: background-color 0.3s ease;
+      }
+    </style>
+    <script
+      defer
+      src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"
+    ></script>
+  </head>
+  <body class="bg-base-200 min-h-screen font-sans">
+    <div class="drawer lg:drawer-open">
+      <input id="main-drawer" type="checkbox" class="drawer-toggle" />
+
+      <div class="drawer-content flex flex-col">
+        <div
+          class="navbar bg-base-100 border-b border-base-300 sticky top-0 z-30 px-4"
+        >
+          <div class="flex-none lg:hidden">
+            <label for="main-drawer" class="btn btn-square btn-ghost">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                class="inline-block w-6 h-6 stroke-current"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                ></path>
+              </svg>
+            </label>
+          </div>
+
+          <div class="flex-1 px-2">
+            <h2 class="text-lg font-bold lg:hidden text-primary">Smart Scan</h2>
+          </div>
+
+          <div class="flex-none flex items-center gap-2">
+            <button @click="toggleDark()" class="btn btn-ghost btn-circle">
+              <svg
+                x-show="!darkMode"
+                x-cloak
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                ></path>
+              </svg>
+              <svg
+                x-show="darkMode"
+                x-cloak
+                class="w-6 h-6 text-yellow-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            </button>
+
+            <div class="avatar placeholder">
+              <div
+                class="bg-primary text-primary-content rounded-full w-8"
+              >
+                <span class="text-xs">PK</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <main class="p-6 lg:p-10 flex-grow">
+          {% block content %}{% endblock %}
+        </main>
+      </div>
+
+      <div class="drawer-side z-40">
+        <label for="main-drawer" class="drawer-overlay"></label>
+        <aside class="bg-base-100 border-r border-base-300 w-72 min-h-full">
+          <div class="p-6 flex items-center gap-3 border-b border-base-300">
+            <div class="bg-primary p-2 rounded-lg text-white">
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                />
+              </svg>
+            </div>
+            <span class="text-xl font-black tracking-tight uppercase"
+              >Smart Scan</span
+            >
+          </div>
+
+          <ul class="menu p-4 w-full text-base-content space-y-2">
+            <li>
+              <a
+                href="{% url 'dashboard' %}"
+                class="{% if request.resolver_match.url_name == 'dashboard' %}active bg-primary text-white{% endif %}"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                  />
+                </svg>
+                Dashboard
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'student.index' %}" class="hover:bg-base-200">
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                  />
+                </svg>
+                Students
+              </a>
+            </li>
+            <li>
+              <a href="#" class="hover:bg-base-200">
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 17v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m32-2v2a4 4 0 00-4-4h-1a4 4 0 00-4 4v2m-24-3h11l3.9 5.2c.5.7.5 1.6 0 2.3L14.9 22H2.1L1 20.2l3.9-5.2z"
+                  />
+                </svg>
+                Reports
+              </a>
+            </li>
+
+            <div class="divider text-[10px] uppercase opacity-40 font-bold">
+              Hardware
+            </div>
+
+            <li>
+              <div class="flex justify-between items-center group">
+                <span class="flex items-center gap-2">
+                  <span class="relative flex h-2 w-2">
+                    <span
+                      class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"
+                    ></span>
+                    <span
+                      class="relative inline-flex rounded-full h-2 w-2 bg-success"
+                    ></span>
+                  </span>
+                  ESP32 Unit 01
+                </span>
+                <span class="badge badge-sm badge-ghost opacity-50"
+                  >Active</span
+                >
+              </div>
+            </li>
+          </ul>
+        </aside>
+      </div>
+    </div>
+  </body>
+</html>

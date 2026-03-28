@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Directory | Smart Scan{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold">Student Directory</h1>
+            <p class="text-sm opacity-60">Manage and view all registered students.</p>
+        </div>
+        
+        <form method="GET" action="." class="flex flex-wrap gap-2">
+            <div class="join">
+                <input type="text" name="q" value="{{ query }}" placeholder="Name or Roll No..." class="input input-bordered join-item focus:input-primary w-full md:w-64" />
+                <button type="submit" class="btn btn-primary join-item">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </button>
+            </div>
+
+            <select name="semester" onchange="this.form.submit()" class="select select-bordered focus:select-primary">
+                <option value="">All Semesters</option>
+                {% for i in "12345678"|make_list %}
+                    <option value="{{ forloop.counter }}" {% if semester_filter == forloop.counter|stringformat:"s" %}selected{% endif %}>
+                        Sem {{ forloop.counter }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <a href="{% url 'student.add' %}" class="btn btn-neutral">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Add New
+            </a>
+        </form>
+    </div>
+
+    <div class="card bg-base-100 shadow-sm border border-base-300">
+        <div class="overflow-x-auto">
+            <table class="table table-zebra w-full">
+                <thead>
+                    <tr class="bg-base-200/50">
+                        <th>Student</th>
+                        <th>Roll No & ID</th>
+                        <th>Current Semester</th>
+                        <th>Contact</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in page_obj %}
+                    <tr class="hover">
+                        <td>
+                            <div class="flex items-center gap-3">
+                                <div class="avatar placeholder">
+                                    <div class="bg-neutral text-neutral-content rounded-full w-10">
+                                        <span>{{ student.name|slice:":1" }}</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="font-bold">{{ student.name }}</div>
+                                    <div class="text-xs opacity-50">{{ student.nrc }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="badge badge-ghost font-mono">{{ student.roll_no }}</div>
+                            <div class="text-xs mt-1 text-primary">#{{ student.student_number }}</div>
+                        </td>
+                        <td>
+                            <span class="badge badge-outline">Semester {{ student.current_semester }}</span>
+                        </td>
+                        <td>
+                            <div class="text-sm">{{ student.phone_no }}</div>
+                            <div class="text-xs opacity-50">{{ student.email|default:"No Email" }}</div>
+                        </td>
+                        <td class="text-right">
+                            <div class="join">
+                                <a href="{% url 'student.view' student.student_id %}" class="btn btn-square btn-ghost btn-sm join-item" title="View Details">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                </a>
+                                <a href="{% url 'student.edit' student.student_id %}" class="btn btn-square btn-ghost btn-sm join-item text-primary" title="Edit">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-10 opacity-50 italic">No students found matching your criteria.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if page_obj.has_other_pages %}
+    <div class="flex justify-center mt-8">
+        <div class="join bg-base-100 shadow-sm">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}&q={{ query }}&semester={{ semester_filter }}" class="join-item btn btn-sm">«</a>
+            {% else %}
+                <button class="join-item btn btn-sm btn-disabled">«</button>
+            {% endif %}
+
+            <button class="join-item btn btn-sm btn-active bg-primary border-primary text-white">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </button>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}&q={{ query }}&semester={{ semester_filter }}" class="join-item btn btn-sm">»</a>
+            {% else %}
+                <button class="join-item btn btn-sm btn-disabled">»</button>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

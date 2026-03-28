@@ -1,0 +1,246 @@
+{% extends 'base.html' %} {% block title %} Add New Student | Smart Scan {% endblock %} {% block content %}
+<div class="max-w-4xl mx-auto">
+  <div class="text-sm breadcrumbs mb-6">
+    <ul>
+      <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+      <li><a href="{% url 'student.index' %}">Students</a></li>
+      <li class="text-primary font-bold">Add Student</li>
+    </ul>
+  </div>
+
+  <div class="card bg-base-100 shadow-xl border border-base-300">
+    <div class="card-body">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="p-3 bg-primary/10 rounded-full text-primary">
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+            />
+          </svg>
+        </div>
+        <h2 class="card-title text-2xl">Registration Form</h2>
+      </div>
+
+      <form method="POST" action="." class="space-y-6">
+        {% csrf_token %}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="form-control w-full">
+            <label class="label"
+              ><span class="label-text font-semibold"
+                >Student Number</span
+              ></label
+            >
+            <input
+              type="number"
+              name="student_number"
+              placeholder="e.g. 2012"
+              class="input input-bordered w-full focus:input-primary"
+              required
+            />
+          </div>
+          <div class="form-control w-full">
+            <label class="label"
+              ><span class="label-text font-semibold">Full Name</span></label
+            >
+            <input
+              type="text"
+              name="name"
+              placeholder="e.g. Mg Mg"
+              class="input input-bordered w-full focus:input-primary"
+              required
+            />
+          </div>
+
+          <div class="form-control w-full">
+            <label class="label"
+              ><span class="label-text font-semibold"
+                >Father's Name</span
+              ></label
+            >
+            <input
+              type="text"
+              name="father_name"
+              placeholder="Enter father's name"
+              class="input input-bordered w-full focus:input-primary"
+              required
+            />
+          </div>
+
+          <div class="form-control w-full">
+            <label class="label"
+              ><span class="label-text font-semibold"
+                >NRC / Identity Number</span
+              ></label
+            >
+            <input
+              type="text"
+              name="nrc"
+              placeholder="12/YAKANA(N)123456"
+              class="input input-bordered w-full focus:input-primary"
+              required
+            />
+          </div>
+
+          <div class="form-control w-full">
+            <label class="label"
+              ><span class="label-text font-semibold"
+                >Date of Birth</span
+              ></label
+            >
+            <input
+              type="date"
+              name="birth_date"
+              class="input input-bordered w-full focus:input-primary"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="divider text-xs uppercase opacity-50">Academic Details</div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="form-control w-full">
+            <label class="label"
+              ><span class="label-text font-semibold"
+                >Student Number</span
+              ></label
+            >
+            <input
+              type="number"
+              name="student_number"
+              placeholder="5501"
+              class="input input-bordered w-full focus:input-primary"
+              required
+            />
+          </div>
+
+          <div class="form-control w-full">
+            <label class="label"
+              ><span class="label-text font-semibold">Roll No.</span></label
+            >
+            <input
+              type="text"
+              name="roll_no"
+              placeholder="3CS-10"
+              class="input input-bordered w-full focus:input-primary"
+              required
+            />
+          </div>
+
+          <div class="form-control w-full">
+            <label class="label"
+              ><span class="label-text font-semibold"
+                >Current Semester</span
+              ></label
+            >
+            <select
+              name="current_semester"
+              class="select select-bordered w-full focus:select-primary"
+            >
+              {% for i in "12345678"|make_list %}
+              <option value="{{ forloop.counter }}">
+                Semester {{ forloop.counter }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="divider text-xs uppercase opacity-50">Contact & Media</div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="form-control w-full">
+            <label class="label"
+              ><span class="label-text font-semibold">Phone Number</span></label
+            >
+            <input
+              type="tel"
+              name="phone_no"
+              placeholder="09xxxxxxxxx"
+              class="input input-bordered w-full focus:input-primary"
+              required
+            />
+          </div>
+
+          <div class="form-control w-full">
+            <label class="label"
+              ><span class="label-text font-semibold"
+                >Email Address</span
+              ></label
+            >
+            <input
+              type="email"
+              name="email"
+              placeholder="student@example.com"
+              class="input input-bordered w-full focus:input-primary"
+            />
+          </div>
+
+          <div class="form-control w-full md:col-span-2">
+            <label class="label"
+              ><span class="label-text font-semibold">Home Address</span></label
+            >
+            <textarea
+              name="address"
+              class="textarea textarea-bordered h-24 focus:textarea-primary"
+              placeholder="Enter full permanent address"
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-control w-full md:col-span-2">
+            <label class="label"
+              ><span class="label-text font-semibold"
+                >Profile Picture URL</span
+              ></label
+            >
+            <div class="join">
+              <input
+                type="text"
+                name="picture_uri"
+                class="input input-bordered join-item w-full focus:input-primary"
+                placeholder="https://storage.link/photo.jpg"
+                required
+              />
+              <button type="button" class="btn btn-neutral join-item">
+                Browse
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="card-actions justify-end mt-8 pt-6 border-t border-base-300"
+        >
+          <button type="button" class="btn btn-ghost">Cancel</button>
+          <button type="submit" class="btn btn-primary px-8 text-white">
+            <svg
+              class="w-4 h-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="3"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+            Save Student
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

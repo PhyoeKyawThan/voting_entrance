@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile: {{ student.name }} | Smart Scan{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto space-y-6">
+    <div class="flex justify-between items-center">
+        <a href="{% url 'student.index' %}" class="btn btn-ghost btn-sm gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            Back to List
+        </a>
+        <div class="flex gap-2">
+            <button class="btn btn-outline btn-sm">Print ID</button>
+            <a href="{% url 'student.edit' student.student_id %}" class="btn btn-primary btn-sm text-white">Edit Profile</a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="card bg-base-100 shadow-sm border border-base-300 h-fit">
+            <div class="card-body items-center text-center">
+                <div class="avatar online mb-4">
+                    <div class="w-32 rounded-xl ring ring-primary ring-offset-base-100 ring-offset-2">
+                        <img src="{{ student.picture_uri }}" alt="{{ student.name }}" onerror="this.src='https://ui-avatars.com/api/?name={{ student.name }}&background=6366f1&color=fff'" />
+                    </div>
+                </div>
+                <h2 class="text-2xl font-bold">{{ student.name }}</h2>
+                <div class="badge badge-primary font-mono mt-1">{{ student.roll_no }}</div>
+                
+                <div class="divider">Academic Status</div>
+                
+                <div class="grid grid-cols-2 gap-4 w-full">
+                    <div class="bg-base-200 p-3 rounded-lg">
+                        <p class="text-[10px] uppercase opacity-50 font-bold">Semester</p>
+                        <p class="text-lg font-bold">{{ student.current_semester }}</p>
+                    </div>
+                    <div class="bg-base-200 p-3 rounded-lg">
+                        <p class="text-[10px] uppercase opacity-50 font-bold">Type</p>
+                        <p class="text-sm font-bold">{% if student.is_new_student %}Freshman{% else %}Senior{% endif %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-2 space-y-6">
+            <div class="card bg-base-100 shadow-sm border border-base-300">
+                <div class="card-body">
+                    <h3 class="card-title text-sm uppercase opacity-50 mb-4">Detailed Information</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-4">
+                        <div>
+                            <p class="text-xs font-bold text-primary uppercase">NRC Number</p>
+                            <p class="font-medium">{{ student.nrc }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-primary uppercase">Student Number</p>
+                            <p class="font-mono">{{ student.student_number }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-primary uppercase">Father's Name</p>
+                            <p class="font-medium">{{ student.father_name }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-primary uppercase">Date of Birth</p>
+                            <p class="font-medium">{{ student.birth_date|date:"F d, Y" }}</p>
+                        </div>
+                        <div class="md:col-span-2">
+                            <p class="text-xs font-bold text-primary uppercase">Permanent Address</p>
+                            <p class="font-medium">{{ student.address }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-base-100 shadow-sm border border-base-300">
+                <div class="card-body flex-row items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 bg-success/10 text-success rounded-full">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                        </div>
+                        <div>
+                            <p class="text-lg font-bold">{{ student.phone_no }}</p>
+                            <p class="text-xs opacity-60">{{ student.email|default:"No email provided" }}</p>
+                        </div>
+                    </div>
+                    <button class="btn btn-circle btn-ghost">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

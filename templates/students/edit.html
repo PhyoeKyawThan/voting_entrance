@@ -1,0 +1,107 @@
+{% extends 'base.html' %} 
+{% block title %}Edit: {{ student.name }}{% endblock %} 
+{% block content %}
+<div class="text-sm breadcrumbs mb-6">
+    <ul>
+      <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+      <li><a href="{% url 'student.index' %}">Students</a></li>
+      <li class="text-primary font-bold">Add Student</li>
+    </ul>
+  </div>
+<div class="max-w-4xl mx-auto">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold">Edit Student Data</h1>
+    <span class="text-xs font-mono opacity-50">UID: {{ student.student_id }}</span>
+  </div>
+
+  <form method="POST" class="card bg-base-100 shadow-sm border border-base-300">
+    {% csrf_token %}
+    <div class="card-body space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <div class="form-control">
+          <label class="label"><span class="label-text">Full Name</span></label>
+          <input type="text" name="name" value="{{ student.name }}" class="input input-bordered focus:input-primary" required />
+        </div>
+
+        <div class="form-control">
+          <label class="label"><span class="label-text">Student Number</span></label>
+          <input type="number" name="student_number" value="{{ student.student_number }}" class="input input-bordered focus:input-primary" required />
+        </div>
+
+        <div class="form-control">
+          <label class="label"><span class="label-text">Father's Name</span></label>
+          <input type="text" name="father_name" value="{{ student.father_name }}" class="input input-bordered focus:input-primary" required />
+        </div>
+
+        <div class="form-control">
+            <label class="label"><span class="label-text">NRC</span></label>
+            <input type="text" name="nrc" value="{{ student.nrc }}" class="input input-bordered focus:input-primary" required />
+        </div>
+
+        <div class="form-control">
+          <label class="label"><span class="label-text">Roll No</span></label>
+          <input type="text" name="roll_no" value="{{ student.roll_no }}" class="input input-bordered focus:input-primary" required />
+        </div>
+
+        <div class="form-control">
+          <label class="label"><span class="label-text">Current Semester</span></label>
+          <select name="current_semester" class="select select-bordered focus:select-primary" required>
+            {% for i in "12345678"|make_list %}
+            <option value="{{ forloop.counter }}" {% if student.current_semester == forloop.counter %}selected{% endif %}>
+              Semester {{ forloop.counter }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-control">
+          <label class="label"><span class="label-text">Phone Number</span></label>
+          <input type="text" name="phone_no" value="{{ student.phone_no }}" class="input input-bordered focus:input-primary" required />
+        </div>
+
+        <div class="form-control">
+          <label class="label"><span class="label-text">Email</span></label>
+          <input type="email" name="email" value="{{ student.email|default:'' }}" class="input input-bordered focus:input-primary" />
+        </div>
+
+        <div class="form-control md:col-span-2">
+          <label class="label"><span class="label-text">Address</span></label>
+          <textarea name="address" class="textarea textarea-bordered focus:textarea-primary" required>{{ student.address }}</textarea>
+        </div>
+      </div>
+
+      <div class="card-actions justify-between mt-6 pt-6 border-t border-base-300">
+        <button type="button" class="btn btn-error btn-ghost text-error" onclick="delete_modal.showModal()">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          Delete Student
+        </button>
+
+        <div class="flex gap-2">
+          <a href="{% url 'student.index' %}" class="btn btn-ghost">Cancel</a>
+          <button type="submit" class="btn btn-primary text-white px-10">Update Records</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<dialog id="delete_modal" class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box border border-error/20">
+        <h3 class="font-bold text-lg text-error flex items-center gap-2">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            Confirm Deletion
+        </h3>
+        <p class="py-4">Are you sure you want to delete <strong>{{ student.name }}</strong>? This action is permanent.</p>
+        <div class="modal-action">
+            <form method="dialog">
+                <button class="btn btn-ghost">No, Keep Student</button>
+            </form>
+            <form method="POST" action="{% url 'student.delete' student.student_id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-error text-white">Yes, Delete Forever</button>
+            </form>
+        </div>
+    </div>
+</dialog>
+{% endblock %}

@@ -1,0 +1,18 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+/** * Scans your Django templates for classes 
+ */
+@source "../../../**/*.{html,py,js}";
+
+@theme {
+  --variant-dark: .dark &;
+
+  --color-primary: #4f46e5;      /* Indigo 600 */
+  --color-primary-focus: #4338ca; 
+  --color-secondary: #10b981;    /* Emerald for 'Success/Connected' status */
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+}

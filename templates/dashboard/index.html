@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard | Smart Scan{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    
+    <div class="lg:col-span-3 stats shadow bg-base-100 border border-base-300">
+        <div class="stat">
+            <div class="stat-figure text-primary">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            </div>
+            <div class="stat-title">Total Entrances</div>
+            <div class="stat-value text-primary">2,600</div>
+            <div class="stat-desc">Semester 1 (Current)</div>
+        </div>
+        
+        <div class="stat">
+            <div class="stat-figure text-secondary">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            </div>
+            <div class="stat-title">Registered Students</div>
+            <div class="stat-value text-secondary">420</div>
+            <div class="stat-desc">98% Active QR Codes</div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-figure text-success">
+                <div class="avatar online">
+                    <div class="w-12 rounded-full bg-neutral text-neutral-content flex items-center justify-center font-bold">IoT</div>
+                </div>
+            </div>
+            <div class="stat-title">ESP32 Status</div>
+            <div class="stat-value text-success text-2xl">Connected</div>
+            <div class="stat-desc">Latency: 45ms</div>
+        </div>
+    </div>
+
+    <div class="lg:col-span-2 card bg-base-100 shadow border border-base-300">
+        <div class="card-body">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="card-title">Real-time Entry Feed</h2>
+                <span class="badge badge-primary badge-outline animate-pulse font-mono uppercase tracking-tighter">Live Monitor</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="table table-zebra">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>ID Number</th>
+                            <th>Timestamp</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="font-bold">Aung Min</div>
+                                <div class="text-xs opacity-50">Year 3, CS</div>
+                            </td>
+                            <td class="font-mono text-sm text-primary">SC-90312</td>
+                            <td>Just Now</td>
+                            <td><span class="badge badge-success badge-sm">Verified</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-base-100 shadow border border-base-300">
+        <div class="card-body">
+            <h2 class="card-title">Quick Actions</h2>
+            <div class="flex flex-col gap-2 mt-4">
+                <button class="btn btn-primary w-full">Generate QR Token</button>
+                <button class="btn btn-outline w-full">Manual Entry Entry</button>
+                <div class="divider">Reports</div>
+                <button class="btn btn-ghost border-base-300 w-full">Export CSV</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
