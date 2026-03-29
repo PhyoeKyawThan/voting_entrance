@@ -3,7 +3,8 @@
   <ul>
     <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
     <li><a href="{% url 'student.index' %}">Students</a></li>
-    <li class="text-primary font-bold">Add Student</li>
+    <li><a href="{% url 'student.view' student.student_id %}">{{ student.name }}</a></li>
+    <li class="text-primary font-bold">Edit</li>
   </ul>
 </div>
 <div class="max-w-4xl mx-auto">

@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-
 {% block title %}Student Directory | Smart Scan{% endblock %}
 
 {% block content %}
@@ -109,6 +108,15 @@
                                 <a href="{% url 'student.edit' student.student_id %}" class="btn btn-square btn-ghost btn-sm join-item text-primary" title="Edit">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                 </a>
+                                <button class="btn btn-square btn-ghost btn-sm join-item text-primary" title="Delete" onclick="openDeleteModal(`{{ student.name }}`, `{% url 'student.delete' student.student_id %}`)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-red-800" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                      <path d="M3 6h18"></path>
+                                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                      <line x1="10" y1="11" x2="10" y2="17"></line>
+                                      <line x1="14" y1="11" x2="14" y2="17"></line>
+                                    </svg>
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -144,4 +152,40 @@
     </div>
     {% endif %}
 </div>
+
+<dialog id="delete_modal" class="modal modal-bottom sm:modal-middle">
+  <div class="modal-box border border-error/20">
+    <h3 class="font-bold text-lg text-error flex items-center gap-2">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+      </svg>
+      Confirm Deletion
+    </h3>
+    <p class="py-4">
+      Are you sure you want to delete <strong id="modal-student-name"></strong>? This action is permanent.
+    </p>
+    <div class="modal-action">
+      <form method="dialog">
+        <button class="btn btn-ghost">No, Keep Student</button>
+      </form>
+      <form id="modal-delete-form" method="POST" action="" onsubmit="showLoading(this)">
+        {% csrf_token %}
+        <button type="submit" id="delete-btn-text" class="btn btn-error text-white">
+          Yes, Delete Forever
+        </button>
+      </form>
+    </div>
+  </div>
+</dialog>
+
+<script>
+    function openDeleteModal(name, deleteUrl) {
+        const modal = document.getElementById('delete_modal');
+        const namePlaceholder = document.getElementById('modal-student-name');
+        const deleteForm = document.getElementById('modal-delete-form');
+        namePlaceholder.textContent = name;
+        deleteForm.action = deleteUrl;
+        modal.showModal();
+    }
+</script>
 {% endblock %}

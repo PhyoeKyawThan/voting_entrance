@@ -1,11 +1,14 @@
 from django.http.request import HttpRequest
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_POST
 from django.db.models import Q
 from .models import Student, EntranceQR
+from django.contrib import messages
 
+@login_required
 def index(request: HttpRequest):
     query = request.GET.get('q', '')
     semester_filter = request.GET.get('semester', '')
@@ -32,13 +35,15 @@ def index(request: HttpRequest):
     }
     return render(request, 'students/index.html', context)
 
+@login_required
 def view_student(request: HttpRequest, student_id: str):
     if student_id:
         student = Student.objects.get(student_id=student_id)
         return render(request, "students/view.html", {
             "student": student
         })
-
+    
+@login_required
 def get_entrance_qr_view(request: HttpRequest, student_id: str):
     student = get_object_or_404(Student, student_id=student_id)
     qr_record, created = EntranceQR.objects.get_or_create(student=student)
@@ -55,6 +60,7 @@ def get_entrance_qr_view(request: HttpRequest, student_id: str):
         "qr": qr_record
     })
 
+@login_required
 def bulk_qr_view(request):
     semester = request.GET.get('semester')
     student_ids = request.GET.getlist('ids')
@@ -73,6 +79,7 @@ def bulk_qr_view(request):
         "semester": semester
     })
 
+@login_required
 def add_student_view(request: HttpRequest):
     if request.method == "POST":
         name = request.POST.get('name')
@@ -105,6 +112,7 @@ def add_student_view(request: HttpRequest):
 
     return render(request, "students/add.html")
 
+@login_required
 def edit_student_view(request: HttpRequest, student_id: str):
     student = get_object_or_404(Student, student_id=student_id)
 
@@ -124,15 +132,20 @@ def edit_student_view(request: HttpRequest, student_id: str):
         student.email = request.POST.get('email')
         
         student.save()
-        
+        messages.success(request, f"Student '{student.name}' edited!")
         return redirect('student.view', student_id=student.student_id)
 
     return render(request, "students/edit.html", {
         "student": student
     })
 
+@login_required
 @require_POST
-def delete_student_view(request: HttpRequest, student_id):
-    student = get_object_or_404(Student, student_id=student_id)
-    student.delete()
-    return redirect('student_list')
+def delete_student(request, student_id):
+    if request.method == "POST":
+        student = get_object_or_404(Student, student_id=student_id)
+        student_name = student.name
+        student.delete()
+        messages.success(request, f"Student '{student_name}' has been deleted successfully.")
+        
+        return redirect('student.index')
