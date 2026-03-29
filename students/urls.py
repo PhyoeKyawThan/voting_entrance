@@ -7,4 +7,5 @@ urlpatterns = [
     path('<str:student_id>/view', views.view_student, name="student.view"),
     path('<str:student_id>/edit', views.edit_student_view, name="student.edit"),
     path('<str:student_id>/delete', views.delete_student_view, name="student.delete"),
+    path('<str:student_id>/entrance_qr', views.get_entrance_qr_view, name="student.entrance_qr")
 ]

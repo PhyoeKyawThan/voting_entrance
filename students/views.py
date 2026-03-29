@@ -4,7 +4,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_POST
 from django.db.models import Q
-from .models import Student
+from .models import Student, EntranceQR
 
 def index(request: HttpRequest):
     query = request.GET.get('q', '')
@@ -38,6 +38,23 @@ def view_student(request: HttpRequest, student_id: str):
         return render(request, "students/view.html", {
             "student": student
         })
+
+def get_entrance_qr_view(request: HttpRequest, student_id: str):
+    student = get_object_or_404(Student, student_id=student_id)
+    qr_record, created = EntranceQR.objects.get_or_create(student=student)
+
+    if request.method == "POST":
+        if qr_record.qr_image:
+            qr_record.qr_image.delete(save=False)
+        qr_record.qr_code_data = ""
+        qr_record.save()
+        return redirect('get_entrance_qr', student_id=student.student_id)
+
+    return render(request, "students/qr.html", {
+        "student": student,
+        "qr": qr_record
+    })
+        
 
 def add_student_view(request: HttpRequest):
     if request.method == "POST":

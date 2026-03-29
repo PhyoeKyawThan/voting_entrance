@@ -10,7 +10,7 @@
             Back to List
         </a>
         <div class="flex gap-2">
-            <button class="btn btn-outline btn-sm">Print ID</button>
+            <a href="{% url 'student.entrance_qr' student.student_id %}" class="btn btn-outline btn-sm">Print ID</a>
             <a href="{% url 'student.edit' student.student_id %}" class="btn btn-primary btn-sm text-white">Edit Profile</a>
         </div>
     </div>
