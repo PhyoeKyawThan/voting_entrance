@@ -550,6 +550,91 @@
     }
   }
   @layer daisyui.l1.l2.l3 {
+    .dropdown {
+      position: relative;
+      display: inline-block;
+      position-area: var(--anchor-v, bottom) var(--anchor-h, span-right);
+    }
+    .dropdown > *:not(:has(~ [class*="dropdown-content"])):focus {
+      --tw-outline-style: none;
+      outline-style: none;
+    }
+    @media (forced-colors: active) {
+      .dropdown > *:not(:has(~ [class*="dropdown-content"])):focus {
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+      }
+    }
+    .dropdown .dropdown-content {
+      position: absolute;
+    }
+    .dropdown.dropdown-close .dropdown-content, .dropdown:not(details, .dropdown-open, .dropdown-hover:hover, :focus-within) .dropdown-content, .dropdown.dropdown-hover:not(:hover) [tabindex]:first-child:focus:not(:focus-visible) ~ .dropdown-content {
+      display: none;
+      transform-origin: top;
+      opacity: 0%;
+      scale: 95%;
+    }
+    .dropdown[popover], .dropdown .dropdown-content {
+      z-index: 999;
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .dropdown[popover], .dropdown .dropdown-content {
+        animation: dropdown 0.2s;
+        transition-property: opacity, scale, display;
+        transition-behavior: allow-discrete;
+        transition-duration: 0.2s;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      }
+    }
+    @starting-style {
+      .dropdown[popover], .dropdown .dropdown-content {
+        scale: 95%;
+        opacity: 0;
+      }
+    }
+    .dropdown:not(.dropdown-close).dropdown-open > [tabindex]:first-child, .dropdown:not(.dropdown-close):not(.dropdown-hover):focus > [tabindex]:first-child, .dropdown:not(.dropdown-close):focus-within > [tabindex]:first-child {
+      pointer-events: none;
+    }
+    .dropdown:not(.dropdown-close).dropdown-open .dropdown-content, .dropdown:not(.dropdown-close):not(.dropdown-hover):focus .dropdown-content, .dropdown:not(.dropdown-close):focus-within .dropdown-content {
+      opacity: 100%;
+      scale: 100%;
+    }
+    .dropdown:not(.dropdown-close).dropdown-hover:hover .dropdown-content {
+      opacity: 100%;
+      scale: 100%;
+    }
+    .dropdown:is(details) summary::-webkit-details-marker {
+      display: none;
+    }
+    .dropdown:where([popover]) {
+      background: #0000;
+    }
+    .dropdown[popover] {
+      position: fixed;
+      color: inherit;
+    }
+    @supports not (position-area: bottom) {
+      .dropdown[popover] {
+        margin: auto;
+      }
+      .dropdown[popover].dropdown-close, .dropdown[popover].dropdown-open:not(:popover-open) {
+        display: none;
+        transform-origin: top;
+        opacity: 0%;
+        scale: 95%;
+      }
+      .dropdown[popover]::backdrop {
+        background-color: color-mix(in oklab, #000 30%, #0000);
+      }
+    }
+    .dropdown[popover].dropdown-close, .dropdown[popover]:not(.dropdown-open, :popover-open) {
+      display: none;
+      transform-origin: top;
+      opacity: 0%;
+      scale: 95%;
+    }
+  }
+  @layer daisyui.l1.l2.l3 {
     :where(.btn) {
       width: unset;
     }
@@ -1420,6 +1505,34 @@
     inset-inline-start: var(--spacing);
   }
   @layer daisyui.l1.l2 {
+    .dropdown-end {
+      --anchor-h: span-left;
+    }
+    .dropdown-end :where(.dropdown-content) {
+      inset-inline-end: calc(0.25rem * 0);
+      translate: 0 0;
+    }
+    [dir="rtl"] .dropdown-end :where(.dropdown-content) {
+      translate: 0 0;
+    }
+    .dropdown-end.dropdown-left {
+      --anchor-h: left;
+      --anchor-v: span-top;
+    }
+    .dropdown-end.dropdown-left .dropdown-content {
+      top: auto;
+      bottom: calc(0.25rem * 0);
+    }
+    .dropdown-end.dropdown-right {
+      --anchor-h: right;
+      --anchor-v: span-top;
+    }
+    .dropdown-end.dropdown-right .dropdown-content {
+      top: auto;
+      bottom: calc(0.25rem * 0);
+    }
+  }
+  @layer daisyui.l1.l2 {
     .toast-top {
       top: calc(0.25rem * 4);
       bottom: auto;
@@ -1740,14 +1853,29 @@
       }
     }
   }
+  .z-1 {
+    z-index: 1;
+  }
   .z-30 {
     z-index: 30;
   }
   .z-40 {
     z-index: 40;
   }
+  .z-\[1\] {
+    z-index: 1;
+  }
+  .z-\[50\] {
+    z-index: 50;
+  }
   .z-\[100\] {
     z-index: 100;
+  }
+  .z-\[999\] {
+    z-index: 999;
+  }
+  .z-\[999999\] {
+    z-index: 999999;
   }
   @layer daisyui.l1.l2.l3 {
     .stat-figure {
@@ -1880,8 +2008,14 @@
       gap: calc(0.25rem * 4);
     }
   }
+  .m-1 {
+    margin: calc(var(--spacing) * 1);
+  }
   .mx-auto {
     margin-inline: auto;
+  }
+  .my-0 {
+    margin-block: calc(var(--spacing) * 0);
   }
   .my-2 {
     margin-block: calc(var(--spacing) * 2);
@@ -2012,6 +2146,9 @@
   }
   .mt-2 {
     margin-top: calc(var(--spacing) * 2);
+  }
+  .mt-3 {
+    margin-top: calc(var(--spacing) * 3);
   }
   .mt-4 {
     margin-top: calc(var(--spacing) * 4);
@@ -2289,6 +2426,9 @@
   .w-40 {
     width: calc(var(--spacing) * 40);
   }
+  .w-52 {
+    width: calc(var(--spacing) * 52);
+  }
   .w-64 {
     width: calc(var(--spacing) * 64);
   }
@@ -2446,8 +2586,26 @@
   .overflow-x-auto {
     overflow-x: auto;
   }
+  @layer daisyui.l1.l2 {
+    .menu-sm :where(li:not(.menu-title) > *:not(ul, details, .menu-title)), .menu-sm :where(li:not(.menu-title) > details > summary:not(.menu-title)) {
+      border-radius: var(--radius-field);
+      padding-inline: calc(0.25rem * 2.5);
+      padding-block: calc(0.25rem * 1);
+      font-size: 0.75rem;
+    }
+    .menu-sm .menu-title {
+      padding-inline: calc(0.25rem * 3);
+      padding-block: calc(0.25rem * 2);
+    }
+  }
   .rounded-3xl {
     border-radius: var(--radius-3xl);
+  }
+  .rounded-box {
+    border-radius: var(--radius-box);
+  }
+  .rounded-box {
+    border-radius: var(--radius-box);
   }
   .rounded-full {
     border-radius: calc(infinity * 1px);
@@ -2619,6 +2777,20 @@
   }
   .p-8 {
     padding: calc(var(--spacing) * 8);
+  }
+  @layer daisyui.l1.l2.l3 {
+    .menu-title {
+      padding-inline: calc(0.25rem * 3);
+      padding-block: calc(0.25rem * 2);
+      color: var(--color-base-content);
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .menu-title {
+        color: color-mix(in oklab, var(--color-base-content) 40%, transparent);
+      }
+    }
   }
   .px-2 {
     padding-inline: calc(var(--spacing) * 2);
