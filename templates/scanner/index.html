@@ -1,0 +1,117 @@
+{% load tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Scanner</title>
+    {% tailwind_css %}
+</head>
+<body class="bg-base-200 min-h-screen p-4 md:p-8">
+    <div class="max-w-2xl mx-auto space-y-6">
+        <div class="text-center">
+            <h1 class="text-3xl font-black tracking-tight">QR Attendance Scanner</h1>
+            <p class="text-base-content/60">Position the student QR code within the frame</p>
+        </div>
+
+        <div class="card bg-base-100 shadow-xl border border-base-300 overflow-hidden">
+            <div id="reader" class="w-full bg-black aspect-video"></div>
+            
+            <div class="card-body bg-base-100 border-t border-base-300">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="card-title text-sm uppercase tracking-widest opacity-70">Scanner Status</h2>
+                        <div id="status-text" class="flex items-center gap-2 text-success font-bold">
+                            <span class="relative flex h-3 w-3">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 bg-success"></span>
+                            </span>
+                            Active & Ready
+                        </div>
+                    </div>
+                    <button onclick="location.reload()" class="btn btn-ghost btn-sm">Reset Camera</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="result-card" class="hidden card bg-primary text-primary-content shadow-lg animate-in fade-in slide-in-from-bottom-4">
+            <div class="card-body p-4 flex-row items-center gap-4">
+                <div class="bg-primary-content/20 p-2 rounded-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                </div>
+                <div>
+                    <p class="text-xs opacity-70 uppercase font-bold">Successfully Scanned</p>
+                    <p id="scanned-result" class="font-mono font-bold"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
+    <script>
+        const statusText = document.getElementById('status-text');
+        const resultCard = document.getElementById('result-card');
+        const resultText = document.getElementById('scanned-result');
+
+        function onScanSuccess(decodedText, decodedResult) {
+            html5QrcodeScanner.pause(true);
+            
+            resultCard.classList.remove('hidden');
+            resultText.innerText = decodedText;
+            statusText.innerHTML = `<span class="loading loading-spinner loading-xs"></span> Sending to server...`;
+
+            fetch("{% url 'scanner.scan' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    qr_data: decodedText,
+                    timestamp: new Date().toISOString()
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    setTimeout(() => {
+                        html5QrcodeScanner.resume();
+                        resultCard.classList.add('hidden');
+                        statusText.innerHTML = `
+                            <span class="relative flex h-3 w-3">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 bg-success"></span>
+                            </span>
+                            Active & Ready`;
+                    }, 2000);
+                } else {
+                    alert("Error: " + data.message);
+                    html5QrcodeScanner.resume();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                html5QrcodeScanner.resume();
+            });
+        }
+
+        let html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader", 
+            { 
+                fps: 10, 
+                qrbox: {width: 250, height: 250},
+                aspectRatio: 1.777778 
+            },
+            false
+        );
+        html5QrcodeScanner.render(onScanSuccess);
+    </script>
+
+    <style>
+        #reader button { @apply btn btn-sm btn-primary mb-2; }
+        #reader img { @apply hidden; } 
+        #reader { border: none !important; }
+    </style>
+</body>
+</html>
