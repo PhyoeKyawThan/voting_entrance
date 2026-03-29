@@ -75,21 +75,17 @@
 </div>
 
 <style>
-    /* 1. Screen Styles: 3 columns for your Mac/Monitor */
     .qr-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         gap: 1.5rem;
     }
 
-    /* 2. Print Styles: Optimized for A4 Paper */
     @media print {
-        /* Hide everything unnecessary */
         nav, aside, footer, .btn, .print\:hidden, .navbar, .breadcrumbs { 
             display: none !important; 
         }
 
-        /* Reset container constraints */
         main, .container, body { 
             width: 100% !important; 
             max-width: 100% !important; 
@@ -98,33 +94,25 @@
             background: white !important;
         }
 
-        /* The Grid: 2 IDs per row on A4 */
         .qr-grid {
             display: grid !important;
             grid-template-columns: 1fr 1fr !important;
             gap: 10px !important;
         }
 
-        /* CRITICAL: The "No Break" Logic */
         .id-card-container {
-            /* Force the card to stay as one solid block */
             break-inside: avoid !important;
             -webkit-column-break-inside: avoid !important;
             page-break-inside: avoid !important;
-            
-            /* Give some breathing room between cards on paper */
             margin-bottom: 20px !important;
             display: block !important;
             position: relative !important;
         }
-
-        /* Ensure the card border shows up clearly on paper */
         .card {
             border: 1px solid #ddd !important;
             box-shadow: none !important;
         }
-        
-        /* Force background colors (like the primary blue header) to print */
+
         * {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
