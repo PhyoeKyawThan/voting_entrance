@@ -54,7 +54,24 @@ def get_entrance_qr_view(request: HttpRequest, student_id: str):
         "student": student,
         "qr": qr_record
     })
-        
+
+def bulk_qr_view(request):
+    semester = request.GET.get('semester')
+    student_ids = request.GET.getlist('ids')
+    students = Student.objects.all().order_by('roll_no')
+    
+    if semester:
+        students = students.filter(current_semester=semester)
+    if student_ids:
+        students = students.filter(student_id__in=student_ids)
+    for student in students:
+        EntranceQR.objects.get_or_create(student=student)
+    students_with_qr = students.prefetch_related('qr_codes')
+
+    return render(request, "students/bulk_qr.html", {
+        "students": students_with_qr,
+        "semester": semester
+    })
 
 def add_student_view(request: HttpRequest):
     if request.method == "POST":
