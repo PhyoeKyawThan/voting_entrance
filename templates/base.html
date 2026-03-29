@@ -160,7 +160,7 @@
               </a>
             </li>
             <li>
-              <a href="{% url 'student.index' %}" class="hover:bg-base-200">
+              <a href="{% url 'student.index' %}" class="{% if request.resolver_match.url_name in 'student.index,student.add,student.edit,student.view'  %}active bg-primary text-white{% endif %}">
                 <svg
                   class="w-5 h-5"
                   fill="none"

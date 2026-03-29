@@ -29,11 +29,11 @@
         <h2 class="card-title text-2xl">Registration Form</h2>
       </div>
 
-      <form method="POST" action="." class="space-y-6">
+      <form method="POST" action="" class="space-y-6" enctype="multipart/form-data">
         {% csrf_token %}
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="form-control w-full">
+          <!-- <div class="form-control w-full">
             <label class="label"
               ><span class="label-text font-semibold"
                 >Student Number</span
@@ -46,7 +46,7 @@
               class="input input-bordered w-full focus:input-primary"
               required
             />
-          </div>
+          </div> -->
           <div class="form-control w-full">
             <label class="label"
               ><span class="label-text font-semibold">Full Name</span></label
@@ -199,21 +199,85 @@
 
           <div class="form-control w-full md:col-span-2">
             <label class="label"
-              ><span class="label-text font-semibold"
-                >Profile Picture URL</span
-              ></label
+              ><span class="label-text font-semibold">Picture</span></label
             >
-            <div class="join">
-              <input
-                type="text"
-                name="picture_uri"
-                class="input input-bordered join-item w-full focus:input-primary"
-                placeholder="https://storage.link/photo.jpg"
-                required
-              />
-              <button type="button" class="btn btn-neutral join-item">
-                Browse
-              </button>
+            <div class="form-control items-center space-y-4">
+              <label class="label">
+                <span class="label-text font-bold">Student Photo</span>
+              </label>
+
+              <div class="avatar group">
+                <label
+                  for="picture"
+                  class="relative w-32 h-32 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2 cursor-pointer overflow-hidden bg-base-300 transition-all hover:ring-primary-focus"
+                >
+                  <img
+                    id="previewImage"
+                    src="{{ student.picture.url|default:'' }}"
+                    class="w-full h-full object-cover {% if not student.picture %}hidden{% endif %}"
+                    alt="Preview"
+                  />
+
+                  <div
+                    id="placeholder"
+                    class="flex flex-col items-center justify-center w-full h-full {% if student.picture %}hidden{% endif %}"
+                  >
+                    <svg
+                      class="w-8 h-8 opacity-40"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 4v16m8-8H4"
+                      ></path>
+                    </svg>
+                    <span class="text-[10px] uppercase font-bold opacity-40"
+                      >Upload</span
+                    >
+                  </div>
+
+                  <div
+                    class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <svg
+                      class="w-6 h-6 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                      />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                    </svg>
+                  </div>
+                </label>
+
+                <input
+                  type="file"
+                  name="picture"
+                  id="picture"
+                  accept="image/*"
+                  class="hidden"
+                  onchange="previewFile(this)"
+                />
+              </div>
+
+              <p class="text-[10px] opacity-50">
+                Click photo to change (Max 2MB)
+              </p>
             </div>
           </div>
         </div>
@@ -243,4 +307,23 @@
     </div>
   </div>
 </div>
+<script>
+  function previewFile(input) {
+    const file = input.files[0];
+    const preview = document.getElementById("previewImage");
+    const placeholder = document.getElementById("placeholder");
+
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        preview.classList.remove("hidden");
+        placeholder.classList.add("hidden");
+      };
+
+      reader.readAsDataURL(file);
+    }
+  }
+</script>
 {% endblock %}

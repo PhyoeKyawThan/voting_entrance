@@ -40,6 +40,35 @@ def view_student(request: HttpRequest, student_id: str):
         })
 
 def add_student_view(request: HttpRequest):
+    if request.method == "POST":
+        name = request.POST.get('name')
+        father_name = request.POST.get('father_name')
+        nrc = request.POST.get('nrc')
+        birth_date = request.POST.get('birth_date')
+        student_number = request.POST.get('student_number')
+        roll_no = request.POST.get('roll_no')
+        current_semester = request.POST.get('current_semester')
+        phone_no = request.POST.get('phone_no')
+        email = request.POST.get('email')
+        address = request.POST.get('address')
+
+        picture = request.FILES.get('picture')
+        new_student = Student.objects.create(
+            name=name,
+            father_name=father_name,
+            nrc=nrc,
+            birth_date=birth_date,
+            student_number=student_number,
+            roll_no=roll_no,
+            current_semester=current_semester,
+            phone_no=phone_no,
+            email=email,
+            address=address,
+            picture=picture if picture else "" 
+        )
+        
+        return redirect('student.index')
+
     return render(request, "students/add.html")
 
 def edit_student_view(request: HttpRequest, student_id: str):
