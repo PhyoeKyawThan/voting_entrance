@@ -114,7 +114,7 @@
 
               <ul
                 tabindex="0"
-                class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[999] mt-3 w-52 p-2 shadow-2xl border border-base-300 block"
+                class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[999] mt-3 w-52 p-2 shadow-2xl border border-base-300"
               >
                 <li class="menu-title text-xs opacity-50 px-4 py-2">Account</li>
                 <li><a href="#">Profile Settings</a></li>
@@ -224,21 +224,26 @@
               Hardware
             </div>
 
-            <li>
+            <li id="browser-scanner-item">
               <div class="flex justify-between items-center group">
                 <span class="flex items-center gap-2">
-                  <span class="relative flex h-2 w-2">
+                  <span
+                    id="scanner-indicator-container"
+                    class="relative flex h-2 w-2"
+                  >
                     <span
-                      class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"
-                    ></span>
-                    <span
-                      class="relative inline-flex rounded-full h-2 w-2 bg-success"
+                      id="scanner-dot"
+                      class="relative inline-flex rounded-full h-2 w-2 bg-base-content/20 transition-colors duration-500"
                     ></span>
                   </span>
-                  ESP32 Unit 01
+                  <span id="scanner-text" class="opacity-50 transition-opacity"
+                    >Web Browser Cam</span
+                  >
                 </span>
-                <span class="badge badge-sm badge-ghost opacity-50"
-                  >Active</span
+                <span
+                  id="scanner-badge"
+                  class="badge badge-sm badge-ghost opacity-30 font-bold"
+                  >OFFLINE</span
                 >
               </div>
             </li>
@@ -246,5 +251,48 @@
         </aside>
       </div>
     </div>
+    <script>
+      const scannerSocket = new WebSocket(
+        "ws://" + window.location.host + "/ws/scanner/status/",
+      );
+
+      scannerSocket.onmessage = function (e) {
+        const data = JSON.parse(e.data);
+        updateScannerUI(data.is_active);
+      };
+
+      function updateScannerUI(isActive) {
+        const dot = document.getElementById("scanner-dot");
+        const text = document.getElementById("scanner-text");
+        const badge = document.getElementById("scanner-badge");
+        const container = document.getElementById(
+          "scanner-indicator-container",
+        );
+
+        if (isActive) {
+          dot.className = "relative inline-flex rounded-full h-2 w-2 bg-info";
+          text.className = "opacity-100 font-medium";
+          badge.className = "badge badge-sm badge-info text-white font-bold";
+          badge.innerText = "SCANNING";
+
+          if (!document.getElementById("scanner-ping")) {
+            const ping = document.createElement("span");
+            ping.id = "scanner-ping";
+            ping.className =
+              "animate-ping absolute inline-flex h-full w-full rounded-full bg-info opacity-75";
+            container.prepend(ping);
+          }
+        } else {
+          dot.className =
+            "relative inline-flex rounded-full h-2 w-2 bg-base-content/20";
+          text.className = "opacity-50";
+          badge.className = "badge badge-sm badge-ghost opacity-30";
+          badge.innerText = "OFFLINE";
+
+          const ping = document.getElementById("scanner-ping");
+          if (ping) ping.remove();
+        }
+      }
+    </script>
   </body>
 </html>
