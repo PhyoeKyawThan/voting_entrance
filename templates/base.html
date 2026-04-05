@@ -59,9 +59,8 @@
           </div>
 
           <div class="flex-1 px-2">
-            <h2 class="text-lg font-bold lg:hidden text-primary">Smart Scan</h2>
+            <h2 class="text-lg font-bold text-primary">{% block header_title %}Smart Scan{% endblock %}</h2>
           </div>
-
           <div class="flex-none flex items-center gap-2">
             <button @click="toggleDark()" class="btn btn-ghost btn-circle">
               <svg
@@ -154,7 +153,7 @@
               </svg>
             </div>
             <span class="text-xl font-black tracking-tight uppercase"
-              >Smart Scan</span
+              >UCSH Smart Entrance</span
             >
           </div>
 
