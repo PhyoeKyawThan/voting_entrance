@@ -3,6 +3,8 @@
 {% block title %}Dashboard | Smart Scan{% endblock %}
 
 {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     
     <div class="lg:col-span-3 stats shadow bg-base-100 border border-base-300">
@@ -38,9 +40,33 @@
 
     <div class="lg:col-span-2 card bg-base-100 shadow border border-base-300">
         <div class="card-body">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="card-title text-sm opacity-70 uppercase tracking-widest">Hourly Traffic</h2>
+                <div class="badge badge-outline text-xs">9 AM - 4 PM</div>
+            </div>
+            <div class="relative h-[250px] w-full">
+                <canvas id="trafficChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-base-100 shadow border border-base-300">
+        <div class="card-body">
+            <h2 class="card-title">Quick Actions</h2>
+            <div class="flex flex-col gap-2 mt-4">
+                <button class="btn btn-primary w-full shadow-md">Generate QR Token</button>
+                <button class="btn btn-outline w-full">Manual Entry Entry</button>
+                <div class="divider">Reports</div>
+                <button class="btn btn-ghost border-base-300 w-full">Export CSV</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="lg:col-span-3 card bg-base-100 shadow border border-base-300">
+        <div class="card-body">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="card-title">Real-time Entry Feed</h2>
-                <span class="badge badge-primary badge-outline animate-pulse font-mono uppercase tracking-tighter">Live Monitor</span>
+                <h2 class="card-title font-bold">Real-time Entry Feed</h2>
+                <span class="badge badge-primary badge-outline animate-pulse font-mono text-xs">Live Monitor</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="table table-zebra">
@@ -68,17 +94,47 @@
         </div>
     </div>
 
-    <div class="card bg-base-100 shadow border border-base-300">
-        <div class="card-body">
-            <h2 class="card-title">Quick Actions</h2>
-            <div class="flex flex-col gap-2 mt-4">
-                <button class="btn btn-primary w-full">Generate QR Token</button>
-                <button class="btn btn-outline w-full">Manual Entry Entry</button>
-                <div class="divider">Reports</div>
-                <button class="btn btn-ghost border-base-300 w-full">Export CSV</button>
-            </div>
-        </div>
-    </div>
-
 </div>
+
+<script>
+    const ctx = document.getElementById('trafficChart').getContext('2d');
+    const primaryColor = '#570df8'; 
+    const secondaryColor = '#f000b8';
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['9 AM', '10 AM', '11 AM', '12 PM', '1 PM', '2 PM', '3 PM', '4 PM'],
+            datasets: [{
+                label: 'Number of Students',
+                data: [45, 82, 110, 30, 95, 60, 35, 15], 
+                backgroundColor: [
+                    primaryColor, primaryColor, primaryColor, 
+                    secondaryColor, // Highlight lunch break differently
+                    primaryColor, primaryColor, primaryColor, primaryColor
+                ],
+                borderRadius: 6,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                    ticks: { font: { family: 'Inter' } }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { family: 'Inter', weight: 'bold' } }
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}
