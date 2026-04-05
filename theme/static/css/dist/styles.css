@@ -553,6 +553,180 @@
     }
   }
   @layer daisyui.l1.l2.l3 {
+    .pika-single:is(div) {
+      user-select: none;
+      font-size: 0.75rem;
+      z-index: 999;
+      display: inline-block;
+      position: relative;
+      color: var(--color-base-content);
+      background-color: var(--color-base-100);
+      border-radius: var(--radius-box);
+      border: var(--border) solid var(--color-base-200);
+      padding: 0.5rem;
+    }
+    .pika-single:is(div):before, .pika-single:is(div):after {
+      content: "";
+      display: table;
+    }
+    .pika-single:is(div):after {
+      clear: both;
+    }
+    .pika-single:is(div).is-hidden {
+      display: none;
+    }
+    .pika-single:is(div).is-bound {
+      position: absolute;
+    }
+    .pika-single:is(div) .pika-lendar {
+      css-float: left;
+    }
+    .pika-single:is(div) .pika-title {
+      position: relative;
+      text-align: center;
+    }
+    .pika-single:is(div) .pika-title select {
+      cursor: pointer;
+      position: absolute;
+      z-index: 999;
+      margin: 0;
+      left: 0;
+      top: 5px;
+      opacity: 0;
+    }
+    .pika-single:is(div) .pika-label {
+      display: inline-block;
+      position: relative;
+      z-index: 999;
+      overflow: hidden;
+      margin: 0;
+      padding: 5px 3px;
+      background-color: var(--color-base-100);
+    }
+    .pika-single:is(div) .pika-prev, .pika-single:is(div) .pika-next {
+      display: block;
+      cursor: pointer;
+      position: absolute;
+      top: 0;
+      outline: none;
+      border: 0;
+      width: 2.25rem;
+      height: 2.25rem;
+      color: #0000;
+      font-size: 1.2em;
+      border-radius: var(--radius-field);
+    }
+    .pika-single:is(div) .pika-prev:hover, .pika-single:is(div) .pika-next:hover {
+      background-color: var(--color-base-200);
+    }
+    .pika-single:is(div) .pika-prev.is-disabled, .pika-single:is(div) .pika-next.is-disabled {
+      cursor: default;
+      opacity: 0.2;
+    }
+    .pika-single:is(div) .pika-prev:before, .pika-single:is(div) .pika-next:before {
+      display: inline-block;
+      width: 2.25rem;
+      height: 2.25rem;
+      line-height: 2.25;
+      color: var(--color-base-content);
+    }
+    .pika-single:is(div) .pika-prev {
+      left: 0;
+    }
+    .pika-single:is(div) .pika-prev:before {
+      --tw-content: "‹";
+      content: var(--tw-content);
+    }
+    .pika-single:is(div) .pika-next {
+      right: 0;
+    }
+    .pika-single:is(div) .pika-next:before {
+      --tw-content: "›";
+      content: var(--tw-content);
+    }
+    .pika-single:is(div) .pika-select {
+      display: inline-block;
+    }
+    .pika-single:is(div) .pika-table {
+      width: 100%;
+      border-collapse: collapse;
+      border-spacing: 0;
+      border: 0;
+    }
+    .pika-single:is(div) .pika-table th, .pika-single:is(div) .pika-table td {
+      padding: 0;
+    }
+    .pika-single:is(div) .pika-table th {
+      opacity: 0.6;
+      text-align: center;
+      width: 2.25rem;
+      height: 2.25rem;
+    }
+    .pika-single:is(div) .pika-button {
+      cursor: pointer;
+      display: block;
+      outline: none;
+      border: 0;
+      margin: 0;
+      width: 2.25rem;
+      height: 2.25rem;
+      padding: 5px;
+      text-align: right;
+      text-align: center;
+    }
+    .pika-single:is(div) .pika-week {
+      color: var(--color-base-content);
+    }
+    .pika-single:is(div) .is-today .pika-button {
+      background: var(--color-primary);
+      color: var(--color-primary-content);
+    }
+    .pika-single:is(div) .is-selected .pika-button, .pika-single:is(div) .is-selected .pika-button:hover, .pika-single:is(div) .has-event .pika-button, .pika-single:is(div) .has-event .pika-button:hover {
+      color: var(--color-base-100);
+      background-color: var(--color-base-content);
+      border-radius: var(--radius-field);
+    }
+    .pika-single:is(div) .has-event .pika-button {
+      background: var(--color-base-primary);
+    }
+    .pika-single:is(div) .is-disabled .pika-button, .pika-single:is(div) .is-inrange .pika-button {
+      background: var(--color-base-primary);
+    }
+    .pika-single:is(div) .is-startrange .pika-button {
+      color: var(--color-base-100);
+      background: var(--color-base-content);
+      border-radius: var(--radius-field);
+    }
+    .pika-single:is(div) .is-endrange .pika-button {
+      color: var(--color-base-100);
+      background: var(--color-base-content);
+      border-radius: var(--radius-field);
+    }
+    .pika-single:is(div) .is-disabled .pika-button {
+      pointer-events: none;
+      cursor: default;
+      color: var(--color-base-content);
+      opacity: 0.3;
+    }
+    .pika-single:is(div) .is-outside-current-month .pika-button {
+      color: var(--color-base-content);
+      opacity: 0.3;
+    }
+    .pika-single:is(div) .is-selection-disabled {
+      pointer-events: none;
+      cursor: default;
+    }
+    .pika-single:is(div) .pika-button:hover, .pika-single:is(div) .pika-row.pick-whole-week:hover .pika-button {
+      color: var(--color-base-content);
+      background-color: var(--color-base-200);
+      border-radius: var(--radius-field);
+    }
+    .pika-single:is(div) .pika-table abbr {
+      text-decoration: none;
+      font-weight: normal;
+    }
+  }
+  @layer daisyui.l1.l2.l3 {
     .dropdown {
       position: relative;
       display: inline-block;
@@ -2817,6 +2991,9 @@
       background-color: color-mix(in oklab, var(--color-success) 10%, transparent);
     }
   }
+  .bg-transparent {
+    background-color: transparent;
+  }
   .bg-white {
     background-color: var(--color-white);
   }
@@ -2874,6 +3051,9 @@
   }
   .px-2 {
     padding-inline: calc(var(--spacing) * 2);
+  }
+  .px-3 {
+    padding-inline: calc(var(--spacing) * 3);
   }
   .px-4 {
     padding-inline: calc(var(--spacing) * 4);
@@ -3285,6 +3465,13 @@
     }
   }
   @layer daisyui.l1.l2 {
+    .btn-xs {
+      --fontsize: 0.6875rem;
+      --btn-p: 0.5rem;
+      --size: calc(var(--size-field, 0.25rem) * 6);
+    }
+  }
+  @layer daisyui.l1.l2 {
     .badge-info {
       --badge-color: var(--color-info);
       --badge-fg: var(--color-info-content);
@@ -3380,6 +3567,10 @@
       --tw-ring-color: var(--color-primary-focus);
     }
   }
+  .focus\:outline-none:focus {
+    --tw-outline-style: none;
+    outline-style: none;
+  }
   @layer daisyui.l1.l2 {
     .focus\:input-primary:focus, .focus\:input-primary:focus:focus, .focus\:input-primary:focus:focus-within {
       --input-color: var(--color-primary);
@@ -3417,6 +3608,11 @@
   @media (width >= 48rem) {
     .md\:col-span-2 {
       grid-column: span 2 / span 2;
+    }
+  }
+  @media (width >= 48rem) {
+    .md\:w-48 {
+      width: calc(var(--spacing) * 48);
     }
   }
   @media (width >= 48rem) {
@@ -3514,8 +3710,23 @@
     }
   }
   @media (width >= 64rem) {
+    .lg\:w-64 {
+      width: calc(var(--spacing) * 64);
+    }
+  }
+  @media (width >= 64rem) {
     .lg\:grid-cols-3 {
       grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (width >= 64rem) {
+    .lg\:flex-row {
+      flex-direction: row;
+    }
+  }
+  @media (width >= 64rem) {
+    .lg\:items-center {
+      align-items: center;
     }
   }
   @media (width >= 64rem) {
