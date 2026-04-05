@@ -104,10 +104,10 @@
     new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['9 AM', '10 AM', '11 AM', '12 PM', '1 PM', '2 PM', '3 PM', '4 PM'],
+            labels: {{ chart_labels|safe }},
             datasets: [{
                 label: 'Number of Students',
-                data: [45, 82, 110, 30, 95, 60, 35, 15], 
+                data: {{ chart_data|safe }}, 
                 backgroundColor: [
                     primaryColor, primaryColor, primaryColor, 
                     secondaryColor, // Highlight lunch break differently

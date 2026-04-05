@@ -1,8 +1,11 @@
 from django.db import models
 import uuid
+import hmac
+import hashlib
 import qrcode
 from io import BytesIO
 from django.core.files import File
+from django.conf import settings 
 from datetime import datetime
 
 def upload_to_unique(instance, filename):
@@ -49,15 +52,21 @@ class EntranceQR(models.Model):
         on_delete=models.CASCADE, 
         related_name='qr_codes'
     )
-    qr_code_data = models.CharField(max_length=255, unique=True, editable=False)
+    qr_code_data = models.CharField(max_length=500, unique=True, editable=False)
     qr_image = models.ImageField(upload_to='qr_codes/', blank=True, null=True)
-    
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
 
+    def generate_signature(self, data):
+        secret = settings.SECRET_KEY.encode('utf-8')
+        message = str(data).encode('utf-8')
+        return hmac.new(secret, message, hashlib.sha256).hexdigest()
+
     def save(self, *args, **kwargs):
         if not self.qr_code_data:
-            self.qr_code_data = f"SCAN-{self.student.student_id}"
+            uid = str(self.student.student_id)
+            signature = self.generate_signature(uid)
+            self.qr_code_data = f"{uid}.{signature}"
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
         qr.add_data(self.qr_code_data)
         qr.make(fit=True)
@@ -65,10 +74,8 @@ class EntranceQR(models.Model):
         img = qr.make_image(fill_color="black", back_color="white")
         buffer = BytesIO()
         img.save(buffer, format='PNG')
-        file_name = f"qr-{self.student.roll_no}.png"
+        
+        file_name = f"qr-{self.student.roll_no}-{uuid.uuid4().hex[:6]}.png"
         self.qr_image.save(file_name, File(buffer), save=False)
         
         super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f"QR for {self.student.name} ({self.student.roll_no})"

@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'user_auth',
     'students',
     'dashboard',
+    'entrances',
     'scanner',
     'channels',
 ]
@@ -138,7 +139,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Yangon'
 
 USE_I18N = True
 
