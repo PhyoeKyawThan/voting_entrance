@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block title %}Dashboard | Smart Scan{% endblock %}
 
 {% block header_title %}
@@ -7,8 +7,6 @@
 {% endblock %}
     
 {% block content %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     
     <div class="lg:col-span-3 stats shadow bg-base-100 border border-base-300">
@@ -48,7 +46,7 @@
                 <h2 class="card-title text-sm opacity-70 uppercase tracking-widest">Hourly Traffic</h2>
                 <div class="badge badge-outline text-xs">9 AM - 4 PM</div>
             </div>
-            <div class="relative h-[250px] w-full">
+            <div class="relative h-[250px] w-full block" style="max-width: 608px; margin: 0 auto;">
                 <canvas id="trafficChart"></canvas>
             </div>
         </div>
@@ -99,7 +97,7 @@
     </div>
 
 </div>
-
+<script src="{% static 'js/chart.js' %}"></script>
 <script>
     const ctx = document.getElementById('trafficChart').getContext('2d');
     const primaryColor = '#570df8'; 
@@ -123,6 +121,7 @@
         },
         options: {
             responsive: true,
+            resizeDelay: 20,
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false }
