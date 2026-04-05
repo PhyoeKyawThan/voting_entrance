@@ -10,7 +10,7 @@ from django.shortcuts import render
 def dashboard_view(request):
     now = timezone.now()
     today = now.date()
-
+    
     student_count = Student.objects.count()
     active_qrs_count = EntranceQR.objects.filter(is_active=True).count()
     
@@ -29,6 +29,7 @@ def dashboard_view(request):
     active_percentage = (active_qrs_count / student_count * 100) if student_count > 0 else 0
     
     return render(request, 'dashboard/index.html', {
+        "total_entrance": sum(chart_data),
         "registered_student": student_count,
         "active_qr_percentage": round(active_percentage, 1),
         "chart_labels": chart_labels,

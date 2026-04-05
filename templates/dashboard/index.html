@@ -13,8 +13,8 @@
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
             </div>
             <div class="stat-title">Total Entrances</div>
-            <div class="stat-value text-primary">2,600</div>
-            <div class="stat-desc">Semester 1 (Current)</div>
+            <div class="stat-value text-primary">{{ total_entrance }}</div>
+            <div class="stat-desc">Today</div>
         </div>
         
         <div class="stat">
@@ -32,9 +32,9 @@
                     <div class="w-12 rounded-full bg-neutral text-neutral-content flex items-center justify-center font-bold">IoT</div>
                 </div>
             </div>
-            <div class="stat-title">ESP32 Status</div>
-            <div class="stat-value text-success text-2xl">Connected</div>
-            <div class="stat-desc">Latency: 45ms</div>
+            <div class="stat-title">Arduino Status</div>
+            <div class="stat-value text-error text-2xl">Disconnected</div>
+            {% comment %} <div class="stat-desc">Latency: 45ms</div> {% endcomment %}
         </div>
     </div>
 
