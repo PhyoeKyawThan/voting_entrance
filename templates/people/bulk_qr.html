@@ -7,10 +7,6 @@
     <div class="flex justify-between items-center bg-base-100 p-4 rounded-xl shadow-sm border border-base-300 print:hidden">
         <div>
             <h1 class="text-xl font-bold">Bulk Pass Generation</h1>
-            <p class="text-sm opacity-60">
-                {% if semester %}Semester {{ semester }}{% else %}All Students{% endif %} 
-                ({{ students|length }} total)
-            </p>
         </div>
         <div class="flex gap-2">
             <button onclick="window.print()" class="btn btn-primary text-white">
@@ -21,33 +17,31 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 print:grid-cols-2 print:gap-4">
-        {% for student in students %}
+        {% for person in people %}
             <div class="card bg-base-100 shadow-xl border border-base-300 overflow-hidden break-inside-avoid print:shadow-none print:border-2 mb-4">
                 <div class="bg-primary p-3 text-primary-content flex justify-between items-center">
                     <span class="font-bold tracking-tighter text-xs uppercase">Campus Pass</span>
-                    <span class="text-[9px] opacity-70 font-mono">ID: {{ student.student_number }}</span>
                 </div>
 
                 <div class="card-body items-center text-center p-6">
                     <div class="avatar mb-2">
                         <div class="w-20 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                            {% if student.picture %}
-                                <img src="{{ student.picture.url }}" class="object-cover" />
+                            {% if person.picture %}
+                                <img src="{{ person.picture.url }}" class="object-cover" />
                             {% else %}
                                 <div class="bg-neutral text-neutral-content w-full h-full flex items-center justify-center text-xl">
-                                    {{ student.name|first }}
+                                    {{ person.name|first }}
                                 </div>
                             {% endif %}
                         </div>
                     </div>
 
-                    <h2 class="text-lg font-black leading-tight">{{ student.name }}</h2>
-                    <div class="badge badge-outline badge-sm font-mono mt-1">{{ student.roll_no }}</div>
+                    <h2 class="text-lg font-black leading-tight">{{ person.name }}</h2>
 
                     <div class="divider my-2 text-[10px] opacity-30 uppercase">Scan at Gate</div>
 
                     <div class="p-2 bg-white rounded-lg shadow-inner border border-base-200">
-                        {% with qr=student.qr_codes.first %}
+                        {% with qr=person.qr_codes.first %}
                             {% if qr and qr.qr_image %}
                                 <img src="{{ qr.qr_image.url }}" alt="QR Code" class="w-40 h-40 object-contain">
                             {% else %}
@@ -60,7 +54,7 @@
 
                     <div class="mt-4 flex flex-col gap-0.5">
                         <p class="text-[8px] font-mono opacity-30 uppercase tracking-widest">Token</p>
-                        {% with qr=student.qr_codes.first %}
+                        {% with qr=person.qr_codes.first %}
                         <p class="text-[8px] font-mono opacity-50 truncate w-40">{{ qr.qr_code_data|default:"N/A" }}</p>
                         {% endwith %}
                     </div>

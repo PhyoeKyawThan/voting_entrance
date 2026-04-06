@@ -5,32 +5,22 @@
 <div class="space-y-6">
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold">Student Directory</h1>
-            <p class="text-sm opacity-60">Manage and view all registered students.</p>
+            <h1 class="text-2xl font-bold">People Directory</h1>
+            <p class="text-sm opacity-60">Manage and view all registered people.</p>
         </div>
         
         <form method="GET" action="." class="flex flex-wrap gap-2">
             <div class="join">
-                <input type="text" name="q" value="{{ query }}" placeholder="Name or Roll No..." class="input input-bordered join-item focus:input-primary w-full md:w-64" />
+                <input type="text" name="q" value="{{ query }}" placeholder="Name or Father Name..." class="input input-bordered join-item focus:input-primary w-full md:w-64" />
                 <button type="submit" class="btn btn-primary join-item">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 </button>
             </div>
-
-            <select name="semester" onchange="this.form.submit()" class="select select-bordered focus:select-primary">
-                <option value="">All Semesters</option>
-                {% for i in "12345678"|make_list %}
-                    <option value="{{ forloop.counter }}" {% if semester_filter == forloop.counter|stringformat:"s" %}selected{% endif %}>
-                        Sem {{ forloop.counter }}
-                    </option>
-                {% endfor %}
-            </select>
-
-            <a href="{% url 'student.add' %}" class="btn btn-neutral">
+            <a href="{% url 'people.add' %}" class="btn btn-neutral">
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 Add New
             </a>
-            <a href="{% url 'student.bulk-qrs' %}" class="btn btn-neutral">
+            <a href="{% url 'people.bulk-qrs' %}" class="btn btn-neutral">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
                   <rect x="4" y="4" width="4" height="4" fill="currentColor"/>
                   <rect x="10" y="4" width="4" height="4" fill="currentColor"/>
@@ -56,59 +46,49 @@
             <table class="table table-zebra w-full">
                 <thead>
                     <tr class="bg-base-200/50">
-                        <th>Student</th>
-                        <th>Roll No & ID</th>
-                        <th>Current Semester</th>
-                        <th>Contact</th>
+                        <th>Name</th>
+                        <th>Father Name</th>
                         <th class="text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for student in page_obj %}
+                    {% for person in page_obj %}
                     <tr class="hover">
                         <td>
                             <div class="flex items-center gap-3">
                                 <div class="avatar placeholder">
                                     <div class="w-10 h-10 rounded-full overflow-hidden">
-                                        {% if student.picture %}
+                                        {% if person.picture %}
                                             <img 
-                                                src="{{ student.picture.url }}" 
-                                                alt="{{ student.name }}" 
+                                                src="{{ person.picture.url }}" 
+                                                alt="{{ person.name }}" 
                                                 class="w-full h-full object-cover"
                                             >
                                         {% else %}
                                             <div class="flex items-center justify-center w-full h-full bg-neutral text-neutral-content text-lg font-bold">
-                                                {{ student.name|first|upper }}
+                                                {{ person.name|first|upper }}
                                             </div>
                                         {% endif %}
                                     </div>
                                 </div>
                                 <div>
-                                    <div class="font-bold">{{ student.name }}</div>
-                                    <div class="text-xs opacity-50">{{ student.nrc }}</div>
+                                    <div class="font-bold">{{ person.name }}</div>
+                                    <div class="text-xs opacity-50">{{ person.nrc }}</div>
                                 </div>
                             </div>
                         </td>
                         <td>
-                            <div class="badge badge-ghost font-mono">{{ student.roll_no }}</div>
-                            <div class="text-xs mt-1 text-primary">#{{ student.student_number }}</div>
-                        </td>
-                        <td>
-                            <span class="badge badge-outline">Semester {{ student.current_semester }}</span>
-                        </td>
-                        <td>
-                            <div class="text-sm">{{ student.phone_no }}</div>
-                            <div class="text-xs opacity-50">{{ student.email|default:"No Email" }}</div>
+                            <div class="font-bold">{{ person.father_name }}</div>
                         </td>
                         <td class="text-right">
                             <div class="join">
-                                <a href="{% url 'student.view' student.student_id %}" class="btn btn-square btn-ghost btn-sm join-item" title="View Details">
+                                <a href="{% url 'people.view' person.id %}" class="btn btn-square btn-ghost btn-sm join-item" title="View Details">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                 </a>
-                                <a href="{% url 'student.edit' student.student_id %}" class="btn btn-square btn-ghost btn-sm join-item text-primary" title="Edit">
+                                <a href="{% url 'people.edit' person.id %}" class="btn btn-square btn-ghost btn-sm join-item text-primary" title="Edit">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                 </a>
-                                <button class="btn btn-square btn-ghost btn-sm join-item text-primary" title="Delete" onclick="openDeleteModal(`{{ student.name }}`, `{% url 'student.delete' student.student_id %}`)">
+                                <button class="btn btn-square btn-ghost btn-sm join-item text-primary" title="Delete" onclick="openDeleteModal(`{{ person.name }}`, `{% url 'people.delete' person.id %}`)">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-red-800" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                       <path d="M3 6h18"></path>
                                       <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>

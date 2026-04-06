@@ -7,16 +7,14 @@ import datetime
 
 def index(request):
     query = request.GET.get('q', '')
-    semester_filter = request.GET.get('semester', '')
     date_filter = request.GET.get('date', '') 
-    entrances = Entrance.objects.select_related('student').all().order_by('-time')
+    entrances = Entrance.objects.select_related('people').all().order_by('-time')
     if query:
         entrances = entrances.filter(
-            Q(student__name__icontains=query) | 
-            Q(student__roll_no__icontains=query)
+            Q(people__name__icontains=query) | 
+            Q(people__father_name__icontains=query) | 
+            Q(people__nrc__icontains=query)
         )
-    if semester_filter:
-        entrances = entrances.filter(student__current_semester=semester_filter)
 
     if date_filter:
         try:
@@ -35,7 +33,6 @@ def index(request):
     context = {
         'page_obj': page_obj,
         'query': query,
-        'semester_filter': semester_filter,
         'date_filter': date_filter,
     }
 

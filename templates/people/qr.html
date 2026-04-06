@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
-{% block title %}Entrance Pass | {{ student.name }}{% endblock %}
+{% block title %}Entrance Pass | {{ person.name }}{% endblock %}
 
 {% block content %}
 <div class="max-w-md mx-auto print:max-w-full">
     <div class="text-sm breadcrumbs mb-6 print:hidden">
         <ul>
-            <li><a href="{% url 'student.index' %}">Students</a></li>
-            <li><a href="{% url 'student.view' student.student_id %}">{{ student.name }}</a></li>
+            <li><a href="{% url 'people.index' %}">People</a></li>
+            <li><a href="{% url 'people.view' person.id %}">{{ person.name }}</a></li>
             <li class="text-primary font-bold">QR Pass</li>
         </ul>
     </div>
@@ -15,24 +15,23 @@
     <div class="card bg-base-100 shadow-2xl border border-base-300 overflow-hidden print:shadow-none print:border-2">
         <div class="bg-primary p-4 text-primary-content flex justify-between items-center">
             <span class="font-bold tracking-tighter text-lg uppercase">Campus Pass</span>
-            <span class="text-[10px] opacity-70 font-mono">ID: {{ student.student_number }}</span>
         </div>
 
         <div class="card-body items-center text-center p-8">
             <div class="avatar mb-4">
                 <div class="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-4">
-                    {% if student.picture %}
-                        <img src="{{ student.picture.url }}" class="object-cover" />
+                    {% if person.picture %}
+                        <img src="{{ person.picture.url }}" class="object-cover" />
                     {% else %}
                         <div class="bg-neutral text-neutral-content w-full h-full flex items-center justify-center text-2xl">
-                            {{ student.name|first }}
+                            {{ person.name|first }}
                         </div>
                     {% endif %}
                 </div>
             </div>
 
-            <h2 class="text-2xl font-black">{{ student.name }}</h2>
-            <div class="badge badge-outline font-mono mt-1 px-4 py-3">{{ student.roll_no }}</div>
+            <h2 class="text-2xl font-black">{{ person.name }}</h2>
+            <!-- <div class="badge badge-outline font-mono mt-1 px-4 py-3">{{ person.roll_no }}</div> -->
 
             <div class="divider my-4">SCAN AT GATE</div>
 

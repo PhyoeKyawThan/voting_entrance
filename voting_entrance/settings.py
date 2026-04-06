@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-)u-@iyzgj6f$mmx*5*oq97v#(6&_r_tganjb!&n^w!-^a&!z*_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.1.24', '127.0.0.1']
 
 
 # Application definition
@@ -42,11 +42,12 @@ INSTALLED_APPS = [
     'theme',
     'django_browser_reload',
     'user_auth',
-    'students',
+    'people',
     'dashboard',
     'entrances',
     'scanner',
     'channels',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [

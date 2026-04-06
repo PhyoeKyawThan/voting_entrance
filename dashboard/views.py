@@ -1,7 +1,7 @@
 from django.utils import timezone
 from django.db.models import Count
 from django.db.models.functions import ExtractHour
-from students.models import Student, EntranceQR
+from people.models import People, EntranceQR
 from entrances.models import Entrance
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
@@ -11,7 +11,7 @@ def dashboard_view(request):
     now = timezone.now()
     today = now.date()
     
-    student_count = Student.objects.count()
+    people_count = People.objects.count()
     active_qrs_count = EntranceQR.objects.filter(is_active=True).count()
     
     hourly_data = (
@@ -26,11 +26,11 @@ def dashboard_view(request):
     chart_labels = ["9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM", "3 PM", "4 PM"]
     chart_data = [traffic_dict.get(h, 0) for h in range(9, 17)]
     
-    active_percentage = (active_qrs_count / student_count * 100) if student_count > 0 else 0
+    active_percentage = (active_qrs_count / people_count * 100) if people_count > 0 else 0
     
     return render(request, 'dashboard/index.html', {
         "total_entrance": sum(chart_data),
-        "registered_student": student_count,
+        "total_registered": people_count,
         "active_qr_percentage": round(active_percentage, 1),
         "chart_labels": chart_labels,
         "chart_data": chart_data,

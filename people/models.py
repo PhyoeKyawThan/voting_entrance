@@ -11,44 +11,36 @@ from datetime import datetime
 def upload_to_unique(instance, filename):
     ext = filename.split('.')[-1]
     timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-    return f"profiles/{instance.student_number}_{timestamp}.{ext}"
+    return f"profiles/{instance.nrc}_{timestamp}.{ext}"
 
 
-class Student(models.Model):
+class People(models.Model):
     
-    student_id = models.UUIDField(
+    id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
         editable=False
     )
-
-    student_number = models.IntegerField(null=False)
     name = models.CharField(max_length=50)
     picture = models.ImageField(
         upload_to=upload_to_unique,
         blank=True,
         null=True
     )
-    roll_no = models.CharField(max_length=10)
-    current_semester = models.IntegerField()
     nrc = models.CharField(max_length=100)
     father_name = models.CharField(max_length=50)
     address = models.CharField(max_length=255)
-    phone_no = models.CharField(max_length=15)
-    email = models.EmailField(blank=True, null=True)
-    birth_date = models.DateTimeField()
-
     register_date = models.DateTimeField(auto_now_add=True)
 
-    def is_new_student(self):
+    def is_new_people(self):
         return self.current_semester == 1
 
     def __str__(self):
-        return f"name - {self.name}, roll_no - {self.roll_no}"
+        return f"name - {self.name}, nrc - {self.nrc}"
 
 class EntranceQR(models.Model):
-    student = models.ForeignKey(
-        'Student', 
+    people = models.ForeignKey(
+        'People', 
         on_delete=models.CASCADE, 
         related_name='qr_codes'
     )
@@ -64,7 +56,7 @@ class EntranceQR(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.qr_code_data:
-            uid = str(self.student.student_id)
+            uid = str(self.people.id)
             signature = self.generate_signature(uid)
             self.qr_code_data = f"{uid}.{signature}"
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
@@ -75,7 +67,7 @@ class EntranceQR(models.Model):
         buffer = BytesIO()
         img.save(buffer, format='PNG')
         
-        file_name = f"qr-{self.student.roll_no}-{uuid.uuid4().hex[:6]}.png"
+        file_name = f"qr-{self.people.nrc}-{uuid.uuid4().hex[:6]}.png"
         self.qr_image.save(file_name, File(buffer), save=False)
         
         super().save(*args, **kwargs)

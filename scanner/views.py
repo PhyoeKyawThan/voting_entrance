@@ -4,7 +4,7 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .utils import verify_qr_token
-from entrances.models import Student, Entrance
+from entrances.models import People, Entrance
 
 def index(request: HttpRequest):
     return render(request, "scanner/index.html")
@@ -17,15 +17,15 @@ def qr_scan(request):
 
             if not qr_content:
                 return JsonResponse({'status': 'error', 'message': 'No data provided'}, status=400)
-            student_uuid = verify_qr_token(qr_content)
+            people_uuid = verify_qr_token(qr_content)
             
-            if student_uuid:
-                student = get_object_or_404(Student, student_id=student_uuid)
-                new_entrance = Entrance.objects.create(student=student)
+            if people_uuid:
+                person = get_object_or_404(People, id=people_uuid)
+                new_entrance = Entrance.objects.create(people=person)
 
                 return JsonResponse({
                     'status': 'success', 
-                    'message': f'Welcome, {student.name}!',
+                    'message': f'Welcome, {person.name}!',
                     'timestamp': new_entrance.time.strftime('%Y-%m-%d %H:%M:%S')
                 })
             else:

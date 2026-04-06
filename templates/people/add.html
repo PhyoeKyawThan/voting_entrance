@@ -3,8 +3,8 @@
   <div class="text-sm breadcrumbs mb-6">
     <ul>
       <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-      <li><a href="{% url 'student.index' %}">Students</a></li>
-      <li class="text-primary font-bold">Add Student</li>
+      <li><a href="{% url 'people.index' %}">People</a></li>
+      <li class="text-primary font-bold">Add New</li>
     </ul>
   </div>
 
@@ -33,20 +33,6 @@
         {% csrf_token %}
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- <div class="form-control w-full">
-            <label class="label"
-              ><span class="label-text font-semibold"
-                >Student Number</span
-              ></label
-            >
-            <input
-              type="number"
-              name="student_number"
-              placeholder="e.g. 2012"
-              class="input input-bordered w-full focus:input-primary"
-              required
-            />
-          </div> -->
           <div class="form-control w-full">
             <label class="label"
               ><span class="label-text font-semibold">Full Name</span></label
@@ -89,102 +75,9 @@
               required
             />
           </div>
-
-          <div class="form-control w-full">
-            <label class="label"
-              ><span class="label-text font-semibold"
-                >Date of Birth</span
-              ></label
-            >
-            <input
-              type="date"
-              name="birth_date"
-              class="input input-bordered w-full focus:input-primary"
-              required
-            />
-          </div>
         </div>
 
-        <div class="divider text-xs uppercase opacity-50">Academic Details</div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="form-control w-full">
-            <label class="label"
-              ><span class="label-text font-semibold"
-                >Student Number</span
-              ></label
-            >
-            <input
-              type="number"
-              name="student_number"
-              placeholder="5501"
-              class="input input-bordered w-full focus:input-primary"
-              required
-            />
-          </div>
-
-          <div class="form-control w-full">
-            <label class="label"
-              ><span class="label-text font-semibold">Roll No.</span></label
-            >
-            <input
-              type="text"
-              name="roll_no"
-              placeholder="3CS-10"
-              class="input input-bordered w-full focus:input-primary"
-              required
-            />
-          </div>
-
-          <div class="form-control w-full">
-            <label class="label"
-              ><span class="label-text font-semibold"
-                >Current Semester</span
-              ></label
-            >
-            <select
-              name="current_semester"
-              class="select select-bordered w-full focus:select-primary"
-            >
-              {% for i in "12345678"|make_list %}
-              <option value="{{ forloop.counter }}">
-                Semester {{ forloop.counter }}
-              </option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-
-        <div class="divider text-xs uppercase opacity-50">Contact & Media</div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="form-control w-full">
-            <label class="label"
-              ><span class="label-text font-semibold">Phone Number</span></label
-            >
-            <input
-              type="tel"
-              name="phone_no"
-              placeholder="09xxxxxxxxx"
-              class="input input-bordered w-full focus:input-primary"
-              required
-            />
-          </div>
-
-          <div class="form-control w-full">
-            <label class="label"
-              ><span class="label-text font-semibold"
-                >Email Address</span
-              ></label
-            >
-            <input
-              type="email"
-              name="email"
-              placeholder="student@example.com"
-              class="input input-bordered w-full focus:input-primary"
-            />
-          </div>
-
+        <div class="divider text-xs uppercase opacity-50">Contact</div>
           <div class="form-control w-full md:col-span-2">
             <label class="label"
               ><span class="label-text font-semibold">Home Address</span></label
@@ -203,7 +96,7 @@
             >
             <div class="form-control items-center space-y-4">
               <label class="label">
-                <span class="label-text font-bold">Student Photo</span>
+                <span class="label-text font-bold">Person Photo</span>
               </label>
 
               <div class="avatar group">
@@ -213,14 +106,14 @@
                 >
                   <img
                     id="previewImage"
-                    src="{{ student.picture.url|default:'' }}"
-                    class="w-full h-full object-cover {% if not student.picture %}hidden{% endif %}"
+                    src="{{ people.picture.url|default:'' }}"
+                    class="w-full h-full object-cover {% if not people.picture %}hidden{% endif %}"
                     alt="Preview"
                   />
 
                   <div
                     id="placeholder"
-                    class="flex flex-col items-center justify-center w-full h-full {% if student.picture %}hidden{% endif %}"
+                    class="flex flex-col items-center justify-center w-full h-full {% if people.picture %}hidden{% endif %}"
                   >
                     <svg
                       class="w-8 h-8 opacity-40"
@@ -300,7 +193,7 @@
                 d="M5 13l4 4L19 7"
               />
             </svg>
-            Save Student
+            Save
           </button>
         </div>
       </form>

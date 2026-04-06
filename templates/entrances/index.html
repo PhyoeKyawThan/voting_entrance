@@ -2,8 +2,6 @@
 {% block title %}Student Entrances | Smart Scan{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
-<script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
 
 <div class="space-y-6">
     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-base-100 p-4 rounded-xl border border-base-300 shadow-sm">
@@ -12,22 +10,13 @@
             <p class="text-sm opacity-60 text-primary font-medium">Real-time attendance tracking</p>
         </div>
         
-        <form method="GET" action="." class="flex flex-wrap items-center gap-3">
+        <form method="GET" action="." id="filterForm" class="flex flex-wrap items-center gap-3">
             <div class="join">
-                <input type="text" name="q" value="{{ query }}" placeholder="Search Student..." class="input input-bordered join-item focus:input-primary w-full md:w-48 lg:w-64" />
+                <input type="text" name="q" value="{{ query }}" placeholder="Search people..." class="input input-bordered join-item focus:input-primary w-full md:w-48 lg:w-64" />
                 <button type="submit" class="btn btn-primary join-item">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 </button>
             </div>
-
-            <select name="semester" onchange="this.form.submit()" class="select select-bordered focus:select-primary">
-                <option value="">All Semesters</option>
-                {% for i in "12345678"|make_list %}
-                    <option value="{{ forloop.counter }}" {% if semester_filter == forloop.counter|stringformat:"s" %}selected{% endif %}>
-                        Sem {{ forloop.counter }}
-                    </option>
-                {% endfor %}
-            </select>
 
             <div class="flex items-center gap-2 px-3 py-2 border rounded-lg bg-base-200/50 border-base-300">
                 <label for="filterDatePicker" class="cursor-pointer text-primary">
@@ -49,8 +38,7 @@
                 <thead>
                     <tr class="bg-base-200/50">
                         <th>Timestamp</th>
-                        <th>Student Information</th>
-                        <th>Roll No & Sem</th>
+                        <th>Person Information</th>
                         <th>Entrance ID</th>
                         <th class="text-right">Action</th>
                     </tr>
@@ -66,30 +54,26 @@
                             <div class="flex items-center gap-3">
                                 <div class="avatar placeholder">
                                     <div class="w-10 h-10 rounded-full overflow-hidden">
-                                        {% if entrance.student.picture %}
-                                            <img src="{{ entrance.student.picture.url }}" alt="{{ entrance.student.name }}" class="object-cover w-full h-full">
+                                        {% if entrance.people.picture %}
+                                            <img src="{{ entrance.people.picture.url }}" alt="{{ entrance.people.name }}" class="object-cover w-full h-full">
                                         {% else %}
                                             <div class="flex items-center justify-center w-full h-full bg-neutral text-neutral-content text-sm font-bold">
-                                                {{ entrance.student.name|slice:":2"|upper }}
+                                                {{ entrance.people.name|slice:":2"|upper }}
                                             </div>
                                         {% endif %}
                                     </div>
                                 </div>
                                 <div>
-                                    <div class="font-bold">{{ entrance.student.name }}</div>
-                                    <div class="text-xs opacity-50">#{{ entrance.student.student_number }}</div>
+                                    <div class="font-bold">{{ entrance.people.name }}</div>
+                                    <div class="text-xs opacity-50">#{{ entrance.people.nrc }}</div>
                                 </div>
                             </div>
-                        </td>
-                        <td>
-                            <div class="badge badge-outline font-mono text-xs">{{ entrance.student.roll_no }}</div>
-                            <div class="text-xs mt-1">Sem {{ entrance.student.current_semester }}</div>
                         </td>
                         <td>
                             <div class="text-xs opacity-40 font-mono italic">{{ entrance.entrance_id|stringformat:"s"|slice:":8" }}...</div>
                         </td>
                         <td class="text-right">
-                            <a href="{% url 'student.view' entrance.student.student_id %}" class="btn btn-ghost btn-xs text-primary">View Student</a>
+                            <a href="{% url 'people.view' entrance.people.id %}" class="btn btn-ghost btn-xs text-primary">View</a>
                         </td>
                     </tr>
                     {% empty %}
@@ -124,13 +108,30 @@
     {% endif %}
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
+<script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
+
 <script>
-  var picker = new Pikaday({ 
-    field: document.getElementById('filterDatePicker'),
-    format: 'YYYY-MM-DD',
-    onSelect: function() {
-        this._field.form.submit(); 
-    }
+  document.addEventListener('DOMContentLoaded', function() {
+      const dateInput = document.getElementById('filterDatePicker');
+      const filterForm = document.getElementById('filterForm');
+
+      if (!dateInput || !filterForm) {
+          console.error("Missing elements!");
+          return;
+      }
+
+      var picker = new Pikaday({ 
+          field: dateInput,
+          format: 'YYYY-MM-DD',
+          onSelect: function(date) {
+              const formattedDate = this.toString('YYYY-MM-DD');
+              dateInput.value = formattedDate;
+              filterForm.submit();
+          }
+      });
   });
 </script>
 {% endblock %}
