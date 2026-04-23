@@ -1,4 +1,5 @@
-from io import BytesIO
+import csv
+from io import BytesIO, StringIO
 
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Max, Q
@@ -292,6 +293,64 @@ def _build_pdf(period, title, summary_rows, recent_entrances, people_rows):
 	return buffer
 
 
+def _build_csv(period, summary_rows, recent_entrances, people_rows):
+	text_buffer = []
+
+	def add_row(row):
+		text_buffer.append(row)
+
+	add_row(["Smart Entrance Report"])
+	add_row(["Period", period.title()])
+	add_row(["Generated At", timezone.now().strftime("%Y-%m-%d %H:%M:%S")])
+	add_row([])
+
+	add_row(["Summary"])
+	add_row(["Period", "Count"])
+	if summary_rows:
+		for row in summary_rows:
+			add_row([row["label"], row["value"]])
+	else:
+		add_row(["No records found", "-"])
+
+	add_row([])
+	add_row(["Record Logs"])
+	add_row(["Name", "Timestamp", "Status"])
+	if recent_entrances:
+		for entrance in recent_entrances:
+			add_row([
+				entrance.people.name,
+				entrance.time.strftime("%Y-%m-%d %H:%M:%S"),
+				"Verified",
+			])
+	else:
+		add_row(["No recent entries", "-", "-"])
+
+	add_row([])
+	add_row(["People Directory"])
+	add_row(["Name", "NRC", "Father Name", "Address", "Register Date", "Entrance Count", "Last Entrance", "QR Status", "Active QR Count"])
+	if people_rows:
+		for person in people_rows:
+			add_row([
+				person["name"],
+				person["nrc"],
+				person["father_name"],
+				person["address"],
+				person["register_date"].strftime("%Y-%m-%d %H:%M:%S") if person["register_date"] else "-",
+				person["entrance_count"],
+				person["last_entrance"].strftime("%Y-%m-%d %H:%M:%S") if person["last_entrance"] else "-",
+				person["qr_status"],
+				person["active_qr_count"],
+			])
+	else:
+		add_row(["No people found", "-", "-", "-", "-", "-", "-", "-", "-"])
+
+	string_io = StringIO()
+	writer = csv.writer(string_io)
+	for row in text_buffer:
+		writer.writerow(row)
+	return string_io.getvalue().encode("utf-8-sig")
+
+
 @login_required
 def report_view(request):
 	period = request.GET.get("period", "daily").lower()
@@ -349,6 +408,12 @@ def report_view(request):
 		pdf_buffer = _build_pdf(period, title, summary_rows, recent_entrances, people_rows)
 		response = HttpResponse(pdf_buffer.getvalue(), content_type="application/pdf")
 		response["Content-Disposition"] = f'attachment; filename="{period}-entrance-report.pdf"'
+		return response
+
+	if request.GET.get("format") == "csv":
+		csv_content = _build_csv(period, summary_rows, recent_entrances, people_rows)
+		response = HttpResponse(csv_content, content_type="text/csv; charset=utf-8")
+		response["Content-Disposition"] = f'attachment; filename="{period}-entrance-report.csv"'
 		return response
 
 	recent_rows = [
