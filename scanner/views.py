@@ -7,6 +7,7 @@ from django.utils import timezone
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from .utils import verify_qr_token
+from .hardware_bridge import send_to_arduino
 from people.models import People
 from entrances.models import Entrance
 
@@ -20,6 +21,7 @@ def qr_scan(request):
             qr_content = data.get('qr_data')
 
             if not qr_content:
+                send_to_arduino("Unknown", "FAILED", "No data provided")
                 return JsonResponse({'status': 'error', 'message': 'No data provided'}, status=400)
             people_uuid = verify_qr_token(qr_content)
             
@@ -34,6 +36,7 @@ def qr_scan(request):
                 )
 
                 if existing_entrance:
+                    send_to_arduino(person.name, "FAILED", "Already entered today")
                     return JsonResponse(
                         {
                             'status': 'denied',
@@ -60,15 +63,19 @@ def qr_scan(request):
                     },
                 )
 
+                send_to_arduino(person.name, "SUCCESS", "Welcome")
+
                 return JsonResponse({
                     'status': 'success', 
                     'message': f'Welcome, {person.name}!',
                     'timestamp': new_entrance.time.strftime('%Y-%m-%d %H:%M:%S')
                 })
             else:
+                send_to_arduino("Unknown", "FAILED", "Invalid signature")
                 return JsonResponse({'status': 'denied', 'message': 'Invalid Security Signature'}, status=403)
 
         except Exception as e:
+            send_to_arduino("Unknown", "FAILED", str(e))
             return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
