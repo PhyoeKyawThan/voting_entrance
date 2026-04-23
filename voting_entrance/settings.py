@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'people',
     'dashboard',
     'entrances',
+    'report',
     'scanner',
     'channels',
     'django_extensions',

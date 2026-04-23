@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Reports | Smart Scan{% endblock %}
+
+{% block header_title %}
+  Reports
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <div class="card bg-base-100 shadow border border-base-300">
+    <div class="card-body gap-5">
+      <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <h1 class="card-title text-2xl">{{ report_title }}</h1>
+          <p class="opacity-70">Generate PDF reports for daily, monthly, or yearly entrances.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <a href="?period=daily" class="btn btn-sm {% if period == 'daily' %}btn-primary{% else %}btn-outline{% endif %}">Daily</a>
+          <a href="?period=monthly" class="btn btn-sm {% if period == 'monthly' %}btn-primary{% else %}btn-outline{% endif %}">Monthly</a>
+          <a href="?period=yearly" class="btn btn-sm {% if period == 'yearly' %}btn-primary{% else %}btn-outline{% endif %}">Yearly</a>
+          <a href="?period={{ period }}&format=pdf" class="btn btn-sm btn-secondary">Download PDF</a>
+        </div>
+      </div>
+
+      <div class="stats stats-vertical lg:stats-horizontal shadow bg-base-200">
+        <div class="stat">
+          <div class="stat-title">Selected Period Total</div>
+          <div class="stat-value text-primary">{{ total_entries }}</div>
+          <div class="stat-desc">Current {{ period }}</div>
+        </div>
+        <div class="stat">
+          <div class="stat-title">Total People</div>
+          <div class="stat-value text-secondary">{{ total_people }}</div>
+          <div class="stat-desc">Registered profiles</div>
+        </div>
+        <div class="stat">
+          <div class="stat-title">Active People</div>
+          <div class="stat-value text-success">{{ active_people }}</div>
+          <div class="stat-desc">People with at least one entry</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="card bg-base-100 shadow border border-base-300">
+      <div class="card-body">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="card-title text-sm uppercase tracking-widest opacity-70">Summary</h2>
+          <span class="badge badge-outline">{{ period }}</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="table table-zebra">
+            <thead>
+              <tr>
+                <th>Period</th>
+                <th>Count</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in summary_rows %}
+              <tr>
+                <td>{{ row.label }}</td>
+                <td>{{ row.value }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="2" class="text-center opacity-60 py-8">No records found</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card bg-base-100 shadow border border-base-300">
+      <div class="card-body">
+        <h2 class="card-title text-sm uppercase tracking-widest opacity-70">Recent Entrances</h2>
+        <div class="overflow-x-auto">
+          <table class="table table-zebra">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in recent_rows %}
+              <tr>
+                <td class="font-bold">{{ row.name }}</td>
+                <td>{{ row.timestamp|date:"Y-m-d H:i:s" }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="2" class="text-center opacity-60 py-8">No recent entries</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card bg-base-100 shadow border border-base-300">
+    <div class="card-body gap-5">
+      <div class="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <h2 class="card-title text-xl">People Directory</h2>
+          <p class="opacity-70">All registered people with entrance, QR, and profile details.</p>
+        </div>
+        <div class="badge badge-outline">{{ total_people }} records</div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {% for person in people_rows %}
+        <div class="card bg-base-200 border border-base-300 shadow-sm hover:shadow-md transition-shadow">
+          <div class="card-body gap-4">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex items-center gap-4">
+                <div class="avatar {{ person.picture|yesno:'online,offline' }}">
+                  <div class="w-14 rounded-full bg-primary text-primary-content flex items-center justify-center font-bold text-lg overflow-hidden">
+                    {% if person.picture %}
+                      <img src="{{ person.picture.url }}" alt="{{ person.name }}" class="w-full h-full object-cover" />
+                    {% else %}
+                      {{ person.name|first|upper }}
+                    {% endif %}
+                  </div>
+                </div>
+                <div>
+                  <h3 class="text-lg font-bold leading-tight">{{ person.name }}</h3>
+                  <p class="text-xs opacity-60">{{ person.nrc }}</p>
+                </div>
+              </div>
+              <span class="badge {% if person.entrance_count %}badge-success{% else %}badge-ghost{% endif %}">
+                {% if person.entrance_count %}Entered{% else %}Pending{% endif %}
+              </span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <div class="rounded-box bg-base-100 p-3 border border-base-300">
+                <div class="opacity-50 text-xs uppercase">Father</div>
+                <div class="font-medium">{{ person.father_name }}</div>
+              </div>
+              <div class="rounded-box bg-base-100 p-3 border border-base-300">
+                <div class="opacity-50 text-xs uppercase">QR</div>
+                <div class="font-medium">{{ person.qr_status }}</div>
+              </div>
+              <div class="rounded-box bg-base-100 p-3 border border-base-300">
+                <div class="opacity-50 text-xs uppercase">Entries</div>
+                <div class="font-medium">{{ person.entrance_count }}</div>
+              </div>
+              <div class="rounded-box bg-base-100 p-3 border border-base-300">
+                <div class="opacity-50 text-xs uppercase">Last Entry</div>
+                <div class="font-medium">{% if person.last_entrance %}{{ person.last_entrance|date:"Y-m-d H:i" }}{% else %}-{% endif %}</div>
+              </div>
+            </div>
+
+            <div class="rounded-box bg-base-100 p-3 border border-base-300">
+              <div class="opacity-50 text-xs uppercase">Address</div>
+              <div class="text-sm leading-relaxed">{{ person.address }}</div>
+            </div>
+
+            <div class="flex items-center justify-between text-xs opacity-60">
+              <span>Registered {{ person.register_date|date:"Y-m-d" }}</span>
+              <span>{{ person.active_qr_count }} active QR</span>
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full">
+          <div class="alert alert-info">No people found.</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
