@@ -98,7 +98,7 @@ WSGI_APPLICATION = 'voting_entrance.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 've_db',
+        'NAME': 've_db_1',
         'USER': 'dom', 
         'PASSWORD': 'domak',
         'HOST': 'localhost', 

@@ -59,7 +59,9 @@
           </div>
 
           <div class="flex-1 px-2">
-            <h2 class="text-lg font-bold text-primary">{% block header_title %}Smart Scan{% endblock %}</h2>
+            <h2 class="text-lg font-bold text-primary">
+              {% block header_title %}Smart Scan{% endblock %}
+            </h2>
           </div>
           <div class="flex-none flex items-center gap-2">
             <button @click="toggleDark()" class="btn btn-ghost btn-circle">
@@ -278,17 +280,40 @@
         </aside>
       </div>
     </div>
-    <!-- <script>
-      const scannerSocket = new WebSocket(
-        "ws://" + window.location.host + "/ws/scanner/status/",
-      );
+    <script>
+      let scannerSocket = null;
+      let reconnectTimer = null;
 
-      scannerSocket.onmessage = function (e) {
-        const data = JSON.parse(e.data);
-        updateScannerUI(data.is_active);
-      };
+      const wsProtocol =
+        window.location.protocol === "https:" ? "wss://" : "ws://";
 
-      function updateScannerUI(isActive) {
+      function connectScannerStatusSocket() {
+        scannerSocket = new WebSocket(
+          wsProtocol + window.location.host + "/ws/scanner/status/",
+        );
+
+        scannerSocket.onopen = function () {
+          updateScannerUI({ is_active: false, active_count: 0, connecting: true });
+        };
+
+        scannerSocket.onmessage = function (e) {
+          const data = JSON.parse(e.data);
+          updateScannerUI(data);
+        };
+
+        scannerSocket.onclose = function () {
+          updateScannerUI({ is_active: false, active_count: 0, disconnected: true });
+          if (reconnectTimer) clearTimeout(reconnectTimer);
+          reconnectTimer = setTimeout(connectScannerStatusSocket, 1500);
+        };
+      }
+
+      function updateScannerUI(statusPayload) {
+        const isActive = Boolean(statusPayload && statusPayload.is_active);
+        const activeCount = Number(statusPayload?.active_count || 0);
+        const connecting = Boolean(statusPayload?.connecting);
+        const disconnected = Boolean(statusPayload?.disconnected);
+
         const dot = document.getElementById("scanner-dot");
         const text = document.getElementById("scanner-text");
         const badge = document.getElementById("scanner-badge");
@@ -296,11 +321,32 @@
           "scanner-indicator-container",
         );
 
+        if (connecting) {
+          dot.className =
+            "relative inline-flex rounded-full h-2 w-2 bg-warning transition-colors duration-500";
+          text.className = "opacity-80";
+          badge.className = "badge badge-sm badge-warning text-white font-bold";
+          badge.innerText = "CONNECTING";
+          return;
+        }
+
+        if (disconnected) {
+          dot.className =
+            "relative inline-flex rounded-full h-2 w-2 bg-base-content/30 transition-colors duration-500";
+          text.className = "opacity-60";
+          badge.className = "badge badge-sm badge-ghost opacity-70 font-bold";
+          badge.innerText = "RETRYING";
+
+          const ping = document.getElementById("scanner-ping");
+          if (ping) ping.remove();
+          return;
+        }
+
         if (isActive) {
           dot.className = "relative inline-flex rounded-full h-2 w-2 bg-info";
           text.className = "opacity-100 font-medium";
           badge.className = "badge badge-sm badge-info text-white font-bold";
-          badge.innerText = "SCANNING";
+          badge.innerText = activeCount > 1 ? `SCANNING (${activeCount})` : "SCANNING";
 
           if (!document.getElementById("scanner-ping")) {
             const ping = document.createElement("span");
@@ -320,6 +366,8 @@
           if (ping) ping.remove();
         }
       }
-    </script> -->
+
+      connectScannerStatusSocket();
+    </script>
   </body>
 </html>

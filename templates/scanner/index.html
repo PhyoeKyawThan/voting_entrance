@@ -141,19 +141,66 @@
       );
       html5QrcodeScanner.render(onScanSuccess);
 
-      const statusSocket = new WebSocket(
-        "ws://" + window.location.host + "/ws/scanner/status/",
-      );
+      const wsProtocol =
+        window.location.protocol === "https:" ? "wss://" : "ws://";
 
-      statusSocket.onopen = function () {
-        statusSocket.send(
-          JSON.stringify({
-            status: "active",
-          }),
+      let statusSocket = null;
+      let statusHeartbeat = null;
+      let reconnectTimer = null;
+      let isUnloading = false;
+
+      function sendStatus(status) {
+        if (!statusSocket || statusSocket.readyState !== WebSocket.OPEN) return;
+        statusSocket.send(JSON.stringify({ status }));
+      }
+
+      function startHeartbeat() {
+        stopHeartbeat();
+        statusHeartbeat = setInterval(() => {
+          sendStatus("active");
+        }, 10000);
+      }
+
+      function stopHeartbeat() {
+        if (!statusHeartbeat) return;
+        clearInterval(statusHeartbeat);
+        statusHeartbeat = null;
+      }
+
+      function connectStatusSocket() {
+        statusSocket = new WebSocket(
+          wsProtocol + window.location.host + "/ws/scanner/status/",
         );
-      };
+
+        statusSocket.onopen = function () {
+          sendStatus("active");
+          startHeartbeat();
+        };
+
+        statusSocket.onclose = function () {
+          stopHeartbeat();
+          if (!isUnloading) {
+            reconnectTimer = setTimeout(connectStatusSocket, 1500);
+          }
+        };
+      }
+
+      connectStatusSocket();
+
       window.addEventListener("beforeunload", () => {
-        statusSocket.close();
+        isUnloading = true;
+        stopHeartbeat();
+        if (reconnectTimer) clearTimeout(reconnectTimer);
+
+        try {
+          sendStatus("inactive");
+        } catch (e) {
+          console.warn("Failed to send inactive status", e);
+        }
+
+        if (statusSocket) {
+          statusSocket.close();
+        }
       });
     </script>
 

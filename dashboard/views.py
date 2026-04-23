@@ -25,6 +25,11 @@ def dashboard_view(request):
     traffic_dict = {item['hour']: item['count'] for item in hourly_data}
     chart_labels = ["9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM", "3 PM", "4 PM"]
     chart_data = [traffic_dict.get(h, 0) for h in range(9, 17)]
+
+    latest_entrances = (
+        Entrance.objects.select_related('people')
+        .order_by('-time')[:10]
+    )
     
     active_percentage = (active_qrs_count / people_count * 100) if people_count > 0 else 0
     
@@ -34,4 +39,5 @@ def dashboard_view(request):
         "active_qr_percentage": round(active_percentage, 1),
         "chart_labels": chart_labels,
         "chart_data": chart_data,
+        "latest_entrances": latest_entrances,
     })

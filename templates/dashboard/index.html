@@ -30,13 +30,13 @@
 
         <div class="stat">
             <div class="stat-figure text-success">
-                <div class="avatar online">
-                    <div class="w-12 rounded-full bg-neutral text-neutral-content flex items-center justify-center font-bold">IoT</div>
+                <div id="dashboard-device-avatar" class="avatar offline">
+                    <div class="w-12 rounded-full bg-info text-info-content flex items-center justify-center font-bold">SCN</div>
                 </div>
             </div>
-            <div class="stat-title">Arduino Status</div>
-            <div class="stat-value text-error text-2xl">Disconnected</div>
-            {% comment %} <div class="stat-desc">Latency: 45ms</div> {% endcomment %}
+            <div class="stat-title">Scanner Status</div>
+            <div id="dashboard-device-status" class="stat-value text-error text-2xl">Offline</div>
+            <div id="dashboard-device-connections" class="stat-desc">Active connections: 0</div>
         </div>
     </div>
 
@@ -79,14 +79,20 @@
                             <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="entry-feed-body">
+                        {% for entrance in latest_entrances %}
                         <tr>
                             <td>
-                                <div class="font-bold">Aung Min</div>
+                                <div class="font-bold">{{ entrance.people.name }}</div>
                             </td>
-                            <td>Just Now</td>
+                            <td class="entry-time" data-entry-time="{{ entrance.time|date:'c' }}"></td>
                             <td><span class="badge badge-success badge-sm">Verified</span></td>
                         </tr>
+                        {% empty %}
+                        <tr id="entry-feed-empty-row">
+                            <td colspan="3" class="text-center opacity-60 py-8">No entrance records yet</td>
+                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -94,22 +100,27 @@
     </div>
 
 </div>
+{{ chart_labels|json_script:"chart-labels-data" }}
+{{ chart_data|json_script:"chart-values-data" }}
 <script src="{% static 'js/chart.js' %}"></script>
 <script>
+    (() => {
     const ctx = document.getElementById('trafficChart').getContext('2d');
     const primaryColor = '#570df8'; 
     const secondaryColor = '#f000b8';
+    const chartLabels = JSON.parse(document.getElementById('chart-labels-data').textContent);
+    const chartValues = JSON.parse(document.getElementById('chart-values-data').textContent);
 
-    new Chart(ctx, {
+    const trafficChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: {{ chart_labels|safe }},
+            labels: chartLabels,
             datasets: [{
                 label: 'Number of Students',
-                data: {{ chart_data|safe }}, 
+                data: chartValues,
                 backgroundColor: [
                     primaryColor, primaryColor, primaryColor, 
-                    secondaryColor, // Highlight lunch break differently
+                    secondaryColor, 
                     primaryColor, primaryColor, primaryColor, primaryColor
                 ],
                 borderRadius: 6,
@@ -136,5 +147,132 @@
             }
         }
     });
+
+    const dashboardWsProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+    const scannerStatusEl = document.getElementById('dashboard-device-status');
+    const scannerConnectionsEl = document.getElementById('dashboard-device-connections');
+    const scannerAvatarEl = document.getElementById('dashboard-device-avatar');
+    const totalEntranceEl = document.querySelector('.stat-value.text-primary');
+    const entryFeedBody = document.getElementById('entry-feed-body');
+
+    function incrementHourlyChart(entry) {
+        if (!entry || !trafficChart?.data?.datasets?.[0]?.data) return;
+
+        let hour = Number(entry.hour);
+        if (!Number.isInteger(hour)) {
+            const parsedDate = new Date(entry.iso_timestamp || entry.timestamp);
+            if (Number.isNaN(parsedDate.getTime())) return;
+            hour = parsedDate.getHours();
+        }
+
+        const index = hour - 9;
+        if (index < 0 || index >= trafficChart.data.datasets[0].data.length) return;
+
+        const currentValue = Number(trafficChart.data.datasets[0].data[index] || 0);
+        trafficChart.data.datasets[0].data[index] = currentValue + 1;
+        trafficChart.update('none');
+    }
+
+    function formatRelativeTime(value) {
+        if (!value) return '-';
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return '-';
+
+        const seconds = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
+        if (seconds < 10) return 'Just now';
+        if (seconds < 60) return `${seconds} sec ago`;
+
+        const minutes = Math.floor(seconds / 60);
+        if (minutes === 1) return '1 min ago';
+        if (minutes < 60) return `${minutes} mins ago`;
+
+        const hours = Math.floor(minutes / 60);
+        if (hours === 1) return '1 hour ago';
+        if (hours < 24) return `${hours} hours ago`;
+
+        const days = Math.floor(hours / 24);
+        if (days === 1) return '1 day ago';
+        return `${days} days ago`;
+    }
+
+    function refreshRelativeTimes() {
+        document.querySelectorAll('.entry-time[data-entry-time]').forEach((cell) => {
+            const dateValue = cell.getAttribute('data-entry-time');
+            cell.textContent = formatRelativeTime(dateValue);
+        });
+    }
+
+    function updateDeviceStatus(data) {
+        const isActive = Boolean(data && data.is_active);
+        const activeCount = Number(data?.active_count || 0);
+
+        scannerStatusEl.textContent = isActive ? 'Scanning' : 'Offline';
+        scannerStatusEl.className = `stat-value text-2xl ${isActive ? 'text-success' : 'text-error'}`;
+        scannerConnectionsEl.textContent = `Active connections: ${activeCount}`;
+        scannerAvatarEl.className = `avatar ${isActive ? 'online' : 'offline'}`;
+    }
+
+    function appendEntry(entry) {
+        if (!entry || !entryFeedBody) return;
+
+        const emptyRow = document.getElementById('entry-feed-empty-row');
+        if (emptyRow) {
+            emptyRow.remove();
+        }
+
+        const row = document.createElement('tr');
+        const entryTime = entry.iso_timestamp || entry.timestamp;
+        row.innerHTML = `
+            <td><div class="font-bold">${entry.name || '-'}</div></td>
+            <td class="entry-time" data-entry-time="${entryTime || ''}">${formatRelativeTime(entryTime)}</td>
+            <td><span class="badge badge-success badge-sm">${entry.status || 'Verified'}</span></td>
+        `;
+
+        entryFeedBody.prepend(row);
+
+        while (entryFeedBody.children.length > 10) {
+            entryFeedBody.removeChild(entryFeedBody.lastElementChild);
+        }
+
+        const current = Number(totalEntranceEl?.textContent || 0);
+        if (Number.isFinite(current) && totalEntranceEl) {
+            totalEntranceEl.textContent = String(current + 1);
+        }
+    }
+
+    function connectStatusSocket() {
+        const statusSocket = new WebSocket(`${dashboardWsProtocol}${window.location.host}/ws/scanner/status/`);
+
+        statusSocket.onmessage = function (event) {
+            const data = JSON.parse(event.data);
+            updateDeviceStatus(data);
+        };
+
+        statusSocket.onclose = function () {
+            setTimeout(connectStatusSocket, 1500);
+        };
+    }
+
+    function connectFeedSocket() {
+        const feedSocket = new WebSocket(`${dashboardWsProtocol}${window.location.host}/ws/scanner/`);
+
+        feedSocket.onmessage = function (event) {
+            const data = JSON.parse(event.data);
+            if (data.entry) {
+                appendEntry(data.entry);
+                incrementHourlyChart(data.entry);
+            }
+        };
+
+        feedSocket.onclose = function () {
+            setTimeout(connectFeedSocket, 1500);
+        };
+    }
+
+    connectStatusSocket();
+    connectFeedSocket();
+    refreshRelativeTimes();
+    setInterval(refreshRelativeTimes, 60000);
+    })();
 </script>
 {% endblock %}
