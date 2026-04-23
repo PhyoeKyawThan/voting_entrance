@@ -3,6 +3,7 @@ from django.http.request import HttpRequest
 import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from .utils import verify_qr_token
@@ -24,6 +25,24 @@ def qr_scan(request):
             
             if people_uuid:
                 person = get_object_or_404(People, id=people_uuid)
+
+                today = timezone.now().date()
+                existing_entrance = (
+                    Entrance.objects.filter(people=person, time__date=today)
+                    .order_by('-time')
+                    .first()
+                )
+
+                if existing_entrance:
+                    return JsonResponse(
+                        {
+                            'status': 'denied',
+                            'message': f'{person.name} already entered today.',
+                            'timestamp': existing_entrance.time.strftime('%Y-%m-%d %H:%M:%S')
+                        },
+                        status=409,
+                    )
+
                 new_entrance = Entrance.objects.create(people=person)
 
                 channel_layer = get_channel_layer()

@@ -8,6 +8,8 @@
     {% tailwind_css %}
   </head>
   <body class="bg-base-200 min-h-screen p-4 md:p-8">
+    <div id="toast-container" class="toast toast-top toast-end z-[1000]"></div>
+
     <div class="max-w-2xl mx-auto space-y-6">
       <div class="text-center">
         <h1 class="text-3xl font-black tracking-tight">QR Entrance Scanner</h1>
@@ -87,6 +89,31 @@
       const statusText = document.getElementById("status-text");
       const resultCard = document.getElementById("result-card");
       const resultText = document.getElementById("scanned-result");
+      const toastContainer = document.getElementById("toast-container");
+
+      function showToast(message, type = "info") {
+        if (!toastContainer) return;
+
+        const toast = document.createElement("div");
+        let alertClass = "alert-info";
+
+        if (type === "success") {
+          alertClass = "alert-success";
+        } else if (type === "error") {
+          alertClass = "alert-error";
+        } else if (type === "warning") {
+          alertClass = "alert-warning";
+        }
+
+        toast.className = `alert ${alertClass} shadow-lg max-w-sm`;
+        toast.innerHTML = `<span>${message}</span>`;
+        toastContainer.appendChild(toast);
+
+        setTimeout(() => {
+          toast.classList.add("opacity-0", "transition-opacity", "duration-300");
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
 
       function onScanSuccess(decodedText, decodedResult) {
         html5QrcodeScanner.pause(true);
@@ -109,6 +136,7 @@
           .then((response) => response.json())
           .then((data) => {
             if (data.status === "success") {
+              showToast(data.message || "Scan successful", "success");
               setTimeout(() => {
                 html5QrcodeScanner.resume();
                 resultCard.classList.add("hidden");
@@ -120,12 +148,13 @@
                             Active & Ready`;
               }, 2000);
             } else {
-              alert("Error: " + data.message);
+              showToast(data.message || "Scan failed", "error");
               html5QrcodeScanner.resume();
             }
           })
           .catch((error) => {
             console.error("Error:", error);
+            showToast("Network error while sending scan", "error");
             html5QrcodeScanner.resume();
           });
       }
