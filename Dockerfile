@@ -18,9 +18,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN chmod +x docker/entrypoint.sh
+# Windows checkouts often use CRLF; strip CR so the script runs in Linux containers.
+RUN sed -i 's/\r$//' docker/entrypoint.sh && chmod +x docker/entrypoint.sh
 
 EXPOSE 8000
 
-ENTRYPOINT ["docker/entrypoint.sh"]
+ENTRYPOINT ["/bin/sh", "docker/entrypoint.sh"]
 CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "voting_entrance.asgi:application"]
