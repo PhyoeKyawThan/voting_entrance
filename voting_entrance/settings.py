@@ -35,6 +35,12 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',')
+    if origin.strip()
+]
+
 
 # Application definition
 
@@ -69,6 +75,27 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "django_browser_reload.middleware.BrowserReloadMiddleware",
 ]
+
+if not DEBUG:
+    INSTALLED_APPS = [
+        app for app in INSTALLED_APPS if app != 'django_browser_reload'
+    ]
+    MIDDLEWARE = [
+        middleware
+        for middleware in MIDDLEWARE
+        if 'BrowserReload' not in middleware
+    ]
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = os.environ.get('SESSION_COOKIE_SECURE', 'True').lower() in (
+        '1',
+        'true',
+        'yes',
+    )
+    CSRF_COOKIE_SECURE = os.environ.get('CSRF_COOKIE_SECURE', 'True').lower() in (
+        '1',
+        'true',
+        'yes',
+    )
 
 ROOT_URLCONF = 'voting_entrance.urls'
 
