@@ -30,7 +30,7 @@ services:
     restart: unless-stopped
 
   db:
-    image: mysql:8.0
+    image: ghcr.io/phyoekyawthan/mysql:latest
     environment:
       MYSQL_DATABASE: ${DB_NAME:-ve_db_1}
       MYSQL_USER: ${DB_USER:-dom}
@@ -49,7 +49,7 @@ services:
     restart: unless-stopped
 
   redis:
-    image: redis:7-alpine
+    image: ghcr.io/phyoekyawthan/redis:latest 
     ports:
       - "6379:6379"
     restart: unless-stopped
