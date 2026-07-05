@@ -3,6 +3,8 @@ import os
 import time
 import sys
 from dataclasses import dataclass
+from dotenv import load_dotenv
+load_dotenv()
 
 try:
     import serial

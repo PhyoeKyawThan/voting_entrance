@@ -6,7 +6,6 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# mysqlclient build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     default-libmysqlclient-dev \
     build-essential \
@@ -18,7 +17,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Windows checkouts often use CRLF; strip CR so the script runs in Linux containers.
 RUN sed -i 's/\r$//' docker/entrypoint.sh && chmod +x docker/entrypoint.sh
 
 EXPOSE 8000

@@ -1,13 +1,10 @@
-# Development / default stack.
-# For production with nginx, also pass -f docker-compose.prod.yml (see .env.example).
-
 services:
   web:
     build: .
     ports:
       - "8000:8000"
     environment:
-      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+      SECRET_KEY: ${SECRET_KEY:itsasecret}
       DEBUG: ${DEBUG:-True}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,web}
       DB_NAME: ${DB_NAME:-ve_db_1}
@@ -30,7 +27,7 @@ services:
     restart: unless-stopped
 
   db:
-    image: ghcr.io/phyoekyawthan/mysql:latest
+    image: mysql:latest
     environment:
       MYSQL_DATABASE: ${DB_NAME:-ve_db_1}
       MYSQL_USER: ${DB_USER:-dom}
@@ -49,7 +46,7 @@ services:
     restart: unless-stopped
 
   redis:
-    image: ghcr.io/phyoekyawthan/redis:latest 
+    image: redis:latest 
     ports:
       - "6379:6379"
     restart: unless-stopped
