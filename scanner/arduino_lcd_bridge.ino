@@ -1,20 +1,10 @@
-#include <LiquidCrystal.h>
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
 
-LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 String inputLine = "";
 unsigned long lastMessageAt = 0;
-
-void clearRow(int row) {
-  lcd.setCursor(0, row);
-  lcd.print("                    ");
-}
-
-void printRow(int row, String text) {
-  clearRow(row);
-  lcd.setCursor(0, row);
-  lcd.print(text.substring(0, 20));
-}
 
 void showDefaultScreen() {
   lcd.clear();
@@ -22,10 +12,6 @@ void showDefaultScreen() {
   lcd.print("Smart Entrance Ready");
   lcd.setCursor(0, 1);
   lcd.print("Waiting for scan...");
-  lcd.setCursor(0, 2);
-  lcd.print("USB Serial Bridge");
-  lcd.setCursor(0, 3);
-  lcd.print("UNO + 20x4 LCD");
 }
 
 void showPayload(String payload) {
@@ -64,12 +50,17 @@ void showPayload(String payload) {
   lcd.print(message.substring(0, 20));
   lcd.setCursor(0, 3);
   lcd.print("Status: " + status);
+  
   lastMessageAt = millis();
 }
 
 void setup() {
   Serial.begin(9600);
-  lcd.begin(20, 4);
+  
+  lcd.init();
+  lcd.backlight(); 
+  lcd.clear();
+  
   showDefaultScreen();
 }
 
@@ -78,7 +69,7 @@ void loop() {
     char c = (char)Serial.read();
     if (c == '\n') {
       showPayload(inputLine);
-      inputLine = "";
+      inputLine = ""; 
     } else if (c != '\r') {
       inputLine += c;
     }
