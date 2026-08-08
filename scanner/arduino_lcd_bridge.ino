@@ -3,13 +3,39 @@
 
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 
+#define BUZZER_PIN 8
+
+#define BUZZER_ON  LOW
+#define BUZZER_OFF HIGH
+
 String inputLine = "";
 unsigned long lastMessageAt = 0;
+
+void buzzerMute() {
+  digitalWrite(BUZZER_PIN, BUZZER_OFF);
+}
+
+void beep(int duration) {
+  digitalWrite(BUZZER_PIN, BUZZER_ON);  
+  delay(duration);
+  digitalWrite(BUZZER_PIN, BUZZER_OFF); 
+  delay(60);
+}
+
+void beepSuccess() {
+  beep(200);
+}
+
+void beepFailure() {
+  for (int i = 0; i < 4; i++) {
+    beep(100);
+  }
+}
 
 void showDefaultScreen() {
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print("Smart Entrance Ready");
+  lcd.print("Secure Voting System");
   lcd.setCursor(0, 1);
   lcd.print("Waiting for scan...");
 }
@@ -52,16 +78,29 @@ void showPayload(String payload) {
   lcd.print("Status: " + status);
   
   lastMessageAt = millis();
+
+  if (status == "SUCCESS") {
+    beepSuccess();
+  } else {
+    beepFailure();
+  }
 }
 
 void setup() {
   Serial.begin(9600);
   
+  pinMode(BUZZER_PIN, OUTPUT);
+  buzzerMute();
+
+  inputLine.reserve(128);
+  
+  delay(100);
   lcd.init();
   lcd.backlight(); 
   lcd.clear();
   
   showDefaultScreen();
+  beepSuccess(); 
 }
 
 void loop() {

@@ -1,14 +1,14 @@
 import json
 import os
-import time
 import sys
 from dataclasses import dataclass
 from dotenv import load_dotenv
+
 load_dotenv()
 
 try:
     import serial
-except ImportError:  
+except ImportError:
     serial = None
 
 @dataclass(frozen=True)
@@ -19,9 +19,9 @@ class ScannerHardwareConfig:
 
 def get_scanner_hardware_config() -> ScannerHardwareConfig:
     if sys.platform.startswith("win"):
-        default_port = "COM3" 
+        default_port = "COM3"
     else:
-        default_port = "/dev/ttyACM0" 
+        default_port = "/dev/ttyACM0"
     return ScannerHardwareConfig(
         port=os.getenv("SCANNER_SERIAL_PORT", default_port),
         baudrate=int(os.getenv("SCANNER_SERIAL_BAUDRATE", "9600")),
@@ -30,24 +30,41 @@ def get_scanner_hardware_config() -> ScannerHardwareConfig:
 
 _ACTIVE_DEVICE = None
 
-def get_serial_device(config: ScannerHardwareConfig):
+def init_arduino_serial():
     global _ACTIVE_DEVICE
-    if _ACTIVE_DEVICE is None or not _ACTIVE_DEVICE.is_open:
-        if not config.port or serial is None:
-            return None
-        try:
-            _ACTIVE_DEVICE = serial.Serial(config.port, config.baudrate, timeout=config.timeout)
-            time.sleep(2) 
-        except Exception as e:
-            print(f"Error opening serial port: {e}")
-            _ACTIVE_DEVICE = None
+    config = get_scanner_hardware_config()
+    
+    if _ACTIVE_DEVICE is not None and _ACTIVE_DEVICE.is_open:
+        return _ACTIVE_DEVICE
+
+    if not config.port or serial is None:
+        print("Serial library not installed or port not configured.")
+        return None
+
+    try:
+        print(f"Initializing persistent Arduino Serial port on {config.port}...")
+        dev = serial.Serial()
+        dev.port = config.port
+        dev.baudrate = config.baudrate
+        dev.timeout = config.timeout
+        dev.dtr = False
+
+        dev.open()
+        _ACTIVE_DEVICE = dev
+        print("Arduino Serial connected and ready.")
+    except Exception as e:
+        print(f"Error opening Arduino serial port on startup: {e}")
+        _ACTIVE_DEVICE = None
+
     return _ACTIVE_DEVICE
 
 def send_to_arduino(name: str, status: str, message: str = "") -> bool:
-    config = get_scanner_hardware_config()
-    device = get_serial_device(config)
-    
-    if device is None:
+    global _ACTIVE_DEVICE
+
+    if _ACTIVE_DEVICE is None or not _ACTIVE_DEVICE.is_open:
+        _ACTIVE_DEVICE = init_arduino_serial()
+
+    if _ACTIVE_DEVICE is None:
         return False
 
     payload = {
@@ -58,9 +75,10 @@ def send_to_arduino(name: str, status: str, message: str = "") -> bool:
     line = json.dumps(payload, separators=(",", ":")) + "\n"
 
     try:
-        device.write(line.encode("utf-8"))
-        device.flush()
+        _ACTIVE_DEVICE.write(line.encode("utf-8"))
+        _ACTIVE_DEVICE.flush()
         return True
     except Exception as e:
         print(f"Serial Write Error: {e}")
+        _ACTIVE_DEVICE = None 
         return False
