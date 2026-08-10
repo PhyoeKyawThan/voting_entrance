@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Reports | Smart Scan{% endblock %}
+{% block title %}Reports | Secure Voting System{% endblock %}
 
 {% block header_title %}
   Reports
@@ -14,14 +14,10 @@
       <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 class="card-title text-2xl">{{ report_title }}</h1>
-          <p class="opacity-70">Generate PDF reports for daily, monthly, or yearly entrances.</p>
+           <p class="opacity-70">Generate PDF reports for daily entrances.</p>
         </div>
         <div class="flex flex-wrap gap-2">
-          <a href="?period=daily" class="btn btn-sm {% if period == 'daily' %}btn-primary{% else %}btn-outline{% endif %}">Daily</a>
-          <a href="?period=monthly" class="btn btn-sm {% if period == 'monthly' %}btn-primary{% else %}btn-outline{% endif %}">Monthly</a>
-          <a href="?period=yearly" class="btn btn-sm {% if period == 'yearly' %}btn-primary{% else %}btn-outline{% endif %}">Yearly</a>
-          <a href="?period={{ period }}&format=pdf" class="btn btn-sm btn-secondary">Download PDF</a>
-            <a href="?period={{ period }}&format=csv" class="btn btn-sm btn-accent">Download CSV</a>
+          <a href="?period=daily&format=pdf" class="btn btn-sm btn-secondary">Download PDF</a>
         </div>
       </div>
 
@@ -29,7 +25,7 @@
         <div class="stat">
           <div class="stat-title">Selected Period Total</div>
           <div class="stat-value text-primary">{{ total_entries }}</div>
-          <div class="stat-desc">Current {{ period }}</div>
+           <div class="stat-desc">Current Day</div>
         </div>
         <div class="stat">
           <div class="stat-title">Total People</div>
@@ -50,7 +46,7 @@
       <div class="card-body">
         <div class="flex items-center justify-between mb-3">
           <h2 class="card-title text-sm uppercase tracking-widest opacity-70">Summary</h2>
-          <span class="badge badge-outline">{{ period }}</span>
+           <span class="badge badge-outline">Daily</span>
         </div>
         <div class="overflow-x-auto">
           <table class="table table-zebra">

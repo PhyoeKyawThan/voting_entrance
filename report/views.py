@@ -1,9 +1,8 @@
-import csv
-from io import BytesIO, StringIO
+from io import BytesIO
 
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Max, Q
-from django.db.models.functions import TruncDate, TruncHour, TruncMonth
+from django.db.models.functions import TruncHour
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
@@ -16,87 +15,6 @@ from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, Tabl
 
 from entrances.models import Entrance
 from people.models import People
-
-
-def _range_for_period(period):
-	today = timezone.now().date()
-
-	if period == "monthly":
-		return today.replace(day=1)
-
-	if period == "yearly":
-		return today.replace(month=1, day=1)
-
-	return today
-
-
-def _title_for_period(period):
-	return {
-		"daily": "Daily Entrance Report",
-		"monthly": "Monthly Entrance Report",
-		"yearly": "Yearly Entrance Report",
-	}.get(period, "Daily Entrance Report")
-
-
-def _summary_queryset(period):
-	if period == "daily":
-		return (
-			Entrance.objects.annotate(period_key=TruncHour("time"))
-			.values("period_key")
-			.annotate(total=Count("entrance_id"))
-			.order_by("period_key")
-		)
-
-	if period == "monthly":
-		return (
-			Entrance.objects.annotate(period_key=TruncDate("time"))
-			.values("period_key")
-			.annotate(total=Count("entrance_id"))
-			.order_by("period_key")
-		)
-
-	if period == "yearly":
-		return (
-			Entrance.objects.annotate(period_key=TruncMonth("time"))
-			.values("period_key")
-			.annotate(total=Count("entrance_id"))
-			.order_by("period_key")
-		)
-
-	return (
-		Entrance.objects.annotate(period_key=TruncDate("time"))
-		.values("period_key")
-		.annotate(total=Count("entrance_id"))
-		.order_by("period_key")
-	)
-
-
-def _format_period_key(period, value):
-	if not value:
-		return "-"
-
-	if period == "daily":
-		return value.strftime("%H:00")
-
-	if period == "yearly":
-		return value.strftime("%B %Y")
-
-	return value.strftime("%Y-%m-%d")
-
-
-def _build_summary(period):
-	summary_rows = _summary_queryset(period)
-	rows = []
-
-	for row in summary_rows:
-		rows.append(
-			{
-				"label": _format_period_key(period, row["period_key"]),
-				"value": row["total"],
-			}
-		)
-
-	return rows
 
 
 def _build_pdf(period, title, summary_rows, recent_entrances, people_rows):
@@ -293,81 +211,27 @@ def _build_pdf(period, title, summary_rows, recent_entrances, people_rows):
 	return buffer
 
 
-def _build_csv(period, summary_rows, recent_entrances, people_rows):
-	text_buffer = []
-
-	def add_row(row):
-		text_buffer.append(row)
-
-	add_row(["Smart Entrance Report"])
-	add_row(["Period", period.title()])
-	add_row(["Generated At", timezone.now().strftime("%Y-%m-%d %H:%M:%S")])
-	add_row([])
-
-	add_row(["Summary"])
-	add_row(["Period", "Count"])
-	if summary_rows:
-		for row in summary_rows:
-			add_row([row["label"], row["value"]])
-	else:
-		add_row(["No records found", "-"])
-
-	add_row([])
-	add_row(["Record Logs"])
-	add_row(["Name", "Timestamp", "Status"])
-	if recent_entrances:
-		for entrance in recent_entrances:
-			add_row([
-				entrance.people.name,
-				entrance.time.strftime("%Y-%m-%d %H:%M:%S"),
-				"Verified",
-			])
-	else:
-		add_row(["No recent entries", "-", "-"])
-
-	add_row([])
-	add_row(["People Directory"])
-	add_row(["Name", "NRC", "Father Name", "Address", "Register Date", "Entrance Count", "Last Entrance", "QR Status", "Active QR Count"])
-	if people_rows:
-		for person in people_rows:
-			add_row([
-				person["name"],
-				person["nrc"],
-				person["father_name"],
-				person["address"],
-				person["register_date"].strftime("%Y-%m-%d %H:%M:%S") if person["register_date"] else "-",
-				person["entrance_count"],
-				person["last_entrance"].strftime("%Y-%m-%d %H:%M:%S") if person["last_entrance"] else "-",
-				person["qr_status"],
-				person["active_qr_count"],
-			])
-	else:
-		add_row(["No people found", "-", "-", "-", "-", "-", "-", "-", "-"])
-
-	string_io = StringIO()
-	writer = csv.writer(string_io)
-	for row in text_buffer:
-		writer.writerow(row)
-	return string_io.getvalue().encode("utf-8-sig")
-
-
 @login_required
 def report_view(request):
-	period = request.GET.get("period", "daily").lower()
-	if period not in {"daily", "monthly", "yearly"}:
-		period = "daily"
+	period = "daily"
 
-	start_date = _range_for_period(period)
 	entrance_qs = Entrance.objects.select_related("people").order_by("-time")
+	filtered_entrances = entrance_qs.filter(time__date=timezone.now().date())
 
-	if period == "daily":
-		filtered_entrances = entrance_qs.filter(time__date=timezone.now().date())
-	elif period == "monthly":
-		filtered_entrances = entrance_qs.filter(time__year=start_date.year, time__month=start_date.month)
-	else:
-		filtered_entrances = entrance_qs.filter(time__year=start_date.year)
+	summary_rows = [
+		{
+			"label": row["period_key"].strftime("%H:00"),
+			"value": row["total"],
+		}
+		for row in (
+			Entrance.objects.annotate(period_key=TruncHour("time"))
+			.filter(time__date=timezone.now().date())
+			.values("period_key")
+			.annotate(total=Count("entrance_id"))
+			.order_by("period_key")
+		)
+	]
 
-	summary_rows = _build_summary(period)
 	total_entries = filtered_entrances.count()
 	recent_entrances = filtered_entrances[:20]
 
@@ -404,16 +268,10 @@ def report_view(request):
 		)
 
 	if request.GET.get("format") == "pdf":
-		title = _title_for_period(period)
+		title = "Daily Entrance Report"
 		pdf_buffer = _build_pdf(period, title, summary_rows, recent_entrances, people_rows)
 		response = HttpResponse(pdf_buffer.getvalue(), content_type="application/pdf")
-		response["Content-Disposition"] = f'attachment; filename="{period}-entrance-report.pdf"'
-		return response
-
-	if request.GET.get("format") == "csv":
-		csv_content = _build_csv(period, summary_rows, recent_entrances, people_rows)
-		response = HttpResponse(csv_content, content_type="text/csv; charset=utf-8")
-		response["Content-Disposition"] = f'attachment; filename="{period}-entrance-report.csv"'
+		response["Content-Disposition"] = 'attachment; filename="daily-entrance-report.pdf"'
 		return response
 
 	recent_rows = [
@@ -429,7 +287,7 @@ def report_view(request):
 		"report/index.html",
 		{
 			"period": period,
-			"report_title": _title_for_period(period),
+			"report_title": "Daily Entrance Report",
 			"total_entries": total_entries,
 			"summary_rows": summary_rows,
 			"recent_rows": recent_rows,

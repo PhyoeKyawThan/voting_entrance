@@ -1,4 +1,5 @@
 {% load tailwind_tags %}
+{% load static %}
 <!doctype html>
 <html
   lang="en"
@@ -15,7 +16,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}Smart Scan{% endblock %}</title>
+    <title>{% block title %}Secure Voting System{% endblock %}</title>
     {% tailwind_css %}
     <style>
       [x-cloak] {
@@ -42,25 +43,13 @@
         >
           <div class="flex-none lg:hidden">
             <label for="main-drawer" class="btn btn-square btn-ghost">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                class="inline-block w-6 h-6 stroke-current"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                ></path>
-              </svg>
+              <img src="{% static 'images/ucsh_logo.jpg' %}" class="w-13" />
             </label>
           </div>
 
           <div class="flex-1 px-2">
             <h2 class="text-lg font-bold text-primary">
-              {% block header_title %}Smart Scan{% endblock %}
+              {% block header_title %}Secure Voting System{% endblock %}
             </h2>
           </div>
           <div class="flex-none flex items-center gap-2">
@@ -139,23 +128,11 @@
         <label for="main-drawer" class="drawer-overlay"></label>
         <aside class="bg-base-100 border-r border-base-300 w-72 min-h-full">
           <div class="p-6 flex items-center gap-3 border-b border-base-300">
-            <div class="bg-primary p-2 rounded-lg text-white">
-              <svg
-                class="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                />
-              </svg>
+            <div class="p-2 rounded-lg text-white">
+              <img src="{% static 'images/ucsh_logo.jpg' %}" class="w-13" />
             </div>
             <span class="text-xl font-black tracking-tight uppercase"
-              >UCSH Smart Entrance</span
+              >Secure Voting System</span
             >
           </div>
 
