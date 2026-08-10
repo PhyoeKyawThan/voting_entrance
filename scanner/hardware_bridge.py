@@ -58,6 +58,49 @@ def init_arduino_serial():
 
     return _ACTIVE_DEVICE
 
+def _is_device_physically_connected(device):
+    if device is None or not device.is_open:
+        return False
+
+    try:
+        from serial.tools import list_ports
+        if not any(p.device == device.port for p in list_ports.comports()):
+            return False
+    except Exception:
+        pass
+
+    try:
+        _ = device.in_waiting
+        return True
+    except Exception:
+        return False
+
+
+def get_arduino_status():
+    global _ACTIVE_DEVICE
+
+    if _ACTIVE_DEVICE is None:
+        return {
+            "connected": False,
+            "port": get_scanner_hardware_config().port,
+            "error": "not_initialized",
+        }
+
+    if not _is_device_physically_connected(_ACTIVE_DEVICE):
+        _ACTIVE_DEVICE = None
+        return {
+            "connected": False,
+            "port": get_scanner_hardware_config().port,
+            "error": "device_error",
+        }
+
+    return {
+        "connected": True,
+        "port": _ACTIVE_DEVICE.port,
+        "baudrate": _ACTIVE_DEVICE.baudrate,
+    }
+
+
 def send_to_arduino(name: str, status: str, message: str = "") -> bool:
     global _ACTIVE_DEVICE
 

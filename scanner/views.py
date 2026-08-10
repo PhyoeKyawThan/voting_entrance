@@ -7,12 +7,21 @@ from django.utils import timezone
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from .utils import verify_qr_token
-from .hardware_bridge import send_to_arduino
+from .hardware_bridge import send_to_arduino, get_arduino_status
 from people.models import People
 from entrances.models import Entrance
 
+
 def index(request: HttpRequest):
     return render(request, "scanner/index.html")
+
+
+def arduino_status(request: HttpRequest):
+    if request.method != "GET":
+        return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
+
+    return JsonResponse(get_arduino_status())
+
 
 def qr_scan(request):
     if request.method == "POST":

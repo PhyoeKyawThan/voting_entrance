@@ -276,6 +276,29 @@
                 >
               </div>
             </li>
+            <li id="arduino-hardware-item">
+              <div class="flex justify-between items-center group">
+                <span class="flex items-center gap-2">
+                  <span
+                    id="arduino-indicator-container"
+                    class="relative flex h-2 w-2"
+                  >
+                    <span
+                      id="arduino-dot"
+                      class="relative inline-flex rounded-full h-2 w-2 bg-base-content/20 transition-colors duration-500"
+                    ></span>
+                  </span>
+                  <span id="arduino-text" class="opacity-50 transition-opacity"
+                    >Arduino LCD</span
+                  >
+                </span>
+                <span
+                  id="arduino-badge"
+                  class="badge badge-sm badge-ghost opacity-30 font-bold"
+                  >OFFLINE</span
+                >
+              </div>
+            </li>
           </ul>
         </aside>
       </div>
@@ -368,6 +391,48 @@
       }
 
       connectScannerStatusSocket();
+    </script>
+
+    <script>
+      function updateArduinoUI(status) {
+        const connected = Boolean(status && status.connected);
+        const dot = document.getElementById("arduino-dot");
+        const text = document.getElementById("arduino-text");
+        const badge = document.getElementById("arduino-badge");
+        const container = document.getElementById("arduino-indicator-container");
+
+        if (!dot || !text || !badge || !container) {
+          return;
+        }
+
+        if (connected) {
+          dot.className = "relative inline-flex rounded-full h-2 w-2 bg-success";
+          text.className = "opacity-100 font-medium";
+          badge.className = "badge badge-sm badge-success text-white font-bold";
+          badge.innerText = "ONLINE";
+        } else {
+          dot.className = "relative inline-flex rounded-full h-2 w-2 bg-error";
+          text.className = "opacity-70 font-medium";
+          badge.className = "badge badge-sm badge-error text-white font-bold";
+          badge.innerText = "OFFLINE";
+        }
+      }
+
+      async function pollArduinoStatus() {
+        try {
+          const response = await fetch("{% url 'scanner.arduino_status' %}");
+          if (!response.ok) {
+            throw new Error("Failed to fetch Arduino status");
+          }
+          const data = await response.json();
+          updateArduinoUI(data);
+        } catch (e) {
+          updateArduinoUI({ connected: false });
+        }
+      }
+
+      pollArduinoStatus();
+      setInterval(pollArduinoStatus, 2000);
     </script>
   </body>
 </html>
