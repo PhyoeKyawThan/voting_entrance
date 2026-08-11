@@ -10,26 +10,47 @@ LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 String inputLine = "";
 unsigned long lastMessageAt = 0;
+unsigned long lastCharAt = 0;
 
-void buzzerMute() {
-  digitalWrite(BUZZER_PIN, BUZZER_OFF);
-}
+#define INPUT_LINE_MAX 128
+#define INCOMPLETE_TIMEOUT 200
 
-void beep(int duration) {
-  digitalWrite(BUZZER_PIN, BUZZER_ON);  
-  delay(duration);
-  digitalWrite(BUZZER_PIN, BUZZER_OFF); 
-  delay(60);
-}
+enum BuzzerState { BUZZER_IDLE, BUZZER_ON, BUZZER_BETWEEN };
+BuzzerState buzzerState = BUZZER_IDLE;
+unsigned long buzzerStartTime = 0;
+int buzzerBeepCount = 0;
+int buzzerTotalBeeps = 0;
+int buzzerOnDuration = 0;
+int buzzerOffDuration = 0;
 
-void beepSuccess() {
-  beep(200);
-}
+void updateBuzzer() {
+  if (buzzerState == BUZZER_IDLE) return;
 
-void beepFailure() {
-  for (int i = 0; i < 4; i++) {
-    beep(100);
+  if (buzzerState == BUZZER_ON && millis() - buzzerStartTime >= buzzerOnDuration) {
+    digitalWrite(BUZZER_PIN, BUZZER_OFF);
+    buzzerState = BUZZER_BETWEEN;
+    buzzerStartTime = millis();
+  } else if (buzzerState == BUZZER_BETWEEN && millis() - buzzerStartTime >= buzzerOffDuration) {
+    buzzerBeepCount++;
+    if (buzzerBeepCount >= buzzerTotalBeeps) {
+      buzzerState = BUZZER_IDLE;
+      digitalWrite(BUZZER_PIN, BUZZER_OFF);
+    } else {
+      digitalWrite(BUZZER_PIN, BUZZER_ON);
+      buzzerState = BUZZER_ON;
+      buzzerStartTime = millis();
+    }
   }
+}
+
+void startBeep(int totalBeeps, int onDuration, int offDuration) {
+  buzzerTotalBeeps = totalBeeps;
+  buzzerOnDuration = onDuration;
+  buzzerOffDuration = offDuration;
+  buzzerBeepCount = 0;
+  buzzerState = BUZZER_ON;
+  buzzerStartTime = millis();
+  digitalWrite(BUZZER_PIN, BUZZER_ON);
 }
 
 void showDefaultScreen() {
@@ -80,9 +101,9 @@ void showPayload(String payload) {
   lastMessageAt = millis();
 
   if (status == "SUCCESS") {
-    beepSuccess();
+    startBeep(1, 200, 60);
   } else {
-    beepFailure();
+    startBeep(4, 100, 60);
   }
 }
 
@@ -90,7 +111,7 @@ void setup() {
   Serial.begin(9600);
   
   pinMode(BUZZER_PIN, OUTPUT);
-  buzzerMute();
+  digitalWrite(BUZZER_PIN, BUZZER_OFF);
 
   inputLine.reserve(128);
   
@@ -100,7 +121,6 @@ void setup() {
   lcd.clear();
   
   showDefaultScreen();
-  beepSuccess(); 
 }
 
 void loop() {
@@ -109,13 +129,29 @@ void loop() {
     if (c == '\n') {
       showPayload(inputLine);
       inputLine = ""; 
+      lastCharAt = 0;
     } else if (c != '\r') {
       inputLine += c;
+      lastCharAt = millis();
     }
   }
 
+  if (inputLine.length() > 0 && lastCharAt > 0 && millis() - lastCharAt > INCOMPLETE_TIMEOUT) {
+    inputLine = "";
+    lastCharAt = 0;
+  }
+
+  if (inputLine.length() > INPUT_LINE_MAX) {
+    inputLine = "";
+    lastCharAt = 0;
+  }
+
   if (lastMessageAt > 0 && millis() - lastMessageAt > 5000) {
+    inputLine = "";
+    lastCharAt = 0;
     showDefaultScreen();
     lastMessageAt = 0;
   }
+
+  updateBuzzer();
 }

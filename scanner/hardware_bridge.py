@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+import time
 from dataclasses import dataclass
 from dotenv import load_dotenv
 
@@ -29,6 +30,7 @@ def get_scanner_hardware_config() -> ScannerHardwareConfig:
     )
 
 _ACTIVE_DEVICE = None
+_STATUS_CACHE = {"result": None, "expires_at": 0.0}
 
 def init_arduino_serial():
     global _ACTIVE_DEVICE
@@ -51,10 +53,12 @@ def init_arduino_serial():
 
         dev.open()
         _ACTIVE_DEVICE = dev
+        _STATUS_CACHE["expires_at"] = 0.0
         print("Arduino Serial connected and ready.")
     except Exception as e:
         print(f"Error opening Arduino serial port on startup: {e}")
         _ACTIVE_DEVICE = None
+        _STATUS_CACHE["expires_at"] = 0.0
 
     return _ACTIVE_DEVICE
 
@@ -77,28 +81,37 @@ def _is_device_physically_connected(device):
 
 
 def get_arduino_status():
-    global _ACTIVE_DEVICE
+    global _ACTIVE_DEVICE, _STATUS_CACHE
+
+    if time.monotonic() < _STATUS_CACHE["expires_at"]:
+        return _STATUS_CACHE["result"]
 
     if _ACTIVE_DEVICE is None:
-        return {
+        _STATUS_CACHE["result"] = {
             "connected": False,
             "port": get_scanner_hardware_config().port,
             "error": "not_initialized",
         }
+        _STATUS_CACHE["expires_at"] = time.monotonic() + 2.0
+        return _STATUS_CACHE["result"]
 
     if not _is_device_physically_connected(_ACTIVE_DEVICE):
         _ACTIVE_DEVICE = None
-        return {
+        _STATUS_CACHE["result"] = {
             "connected": False,
             "port": get_scanner_hardware_config().port,
             "error": "device_error",
         }
+        _STATUS_CACHE["expires_at"] = time.monotonic() + 2.0
+        return _STATUS_CACHE["result"]
 
-    return {
+    _STATUS_CACHE["result"] = {
         "connected": True,
         "port": _ACTIVE_DEVICE.port,
         "baudrate": _ACTIVE_DEVICE.baudrate,
     }
+    _STATUS_CACHE["expires_at"] = time.monotonic() + 2.0
+    return _STATUS_CACHE["result"]
 
 
 def send_to_arduino(name: str, status: str, message: str = "") -> bool:
@@ -123,5 +136,6 @@ def send_to_arduino(name: str, status: str, message: str = "") -> bool:
         return True
     except Exception as e:
         print(f"Serial Write Error: {e}")
-        _ACTIVE_DEVICE = None 
+        _ACTIVE_DEVICE = None
+        _STATUS_CACHE["expires_at"] = 0.0
         return False

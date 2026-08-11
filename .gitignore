@@ -1,5 +1,6 @@
 venv/
 __pycache__/
+.kilo/
 media/
 .env
 diagrams.md

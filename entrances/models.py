@@ -14,4 +14,9 @@ class Entrance(models.Model):
     )
 
     time = models.DateTimeField(default=now)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['people', 'time'], name='entrance_people_time_idx'),
+        ]
     
