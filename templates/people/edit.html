@@ -1,4 +1,4 @@
-{% extends 'base.html' %} {% block title %}Edit: {{ person.name }}{% endblock %} {% block content %}
+{% extends 'base.html' %} {% load static %} {% block title %}Edit: {{ person.name }}{% endblock %} {% block content %}
 <div class="text-sm breadcrumbs mb-6">
   <ul>
     <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
@@ -91,14 +91,56 @@
         </div>
 
         <div class="form-control w-full">
-          <label class="label"><span class="label-text">NRC</span></label>
+          <label class="label"><span class="label-text">Date of Birth</span></label>
           <input
-            type="text"
-            name="nrc"
-            value="{{ person.nrc }}"
+            type="date"
+            name="date_of_birth"
+            value="{% if form_data.date_of_birth %}{{ form_data.date_of_birth|date:'Y-m-d' }}{% else %}{{ person.date_of_birth|date:'Y-m-d' }}{% endif %}"
+            max="{{ dob_max|date:'Y-m-d' }}"
             class="input input-bordered w-full focus:input-primary"
-            required
           />
+        </div>
+
+        <div class="form-control w-full">
+          <label class="label"><span class="label-text">NRC</span></label>
+          <div
+            data-nrc-widget
+            data-state="{{ form_data.state|default:'' }}"
+            data-district="{{ form_data.district|default:'' }}"
+            data-number="{{ form_data.number|default:'' }}"
+            class="flex flex-wrap items-end gap-2"
+          >
+            <select
+              data-nrc-state
+              class="select select-bordered focus:select-primary"
+              required
+            ></select>
+            <span class="pb-2 text-lg opacity-60">/</span>
+            <select
+              data-nrc-district
+              class="select select-bordered focus:select-primary"
+              disabled
+              required
+            ></select>
+            <span class="pb-2 text-lg opacity-60">(N)</span>
+            <input
+              data-nrc-number
+              type="text"
+              inputmode="numeric"
+              maxlength="6"
+              placeholder="123456"
+              value="{{ form_data.number|default:'' }}"
+              class="input input-bordered w-40 focus:input-primary"
+              required
+            />
+            <input type="hidden" name="nrc" data-nrc-hidden />
+            <input type="hidden" name="nrc_original" value="{{ person.nrc }}" />
+          </div>
+          <div class="mt-2 text-sm opacity-70">
+            Preview:
+            <span data-nrc-preview class="font-mono text-primary"></span>
+          </div>
+          <p data-nrc-error class="text-error text-xs mt-1 hidden"></p>
         </div>
         <div class="form-control w-full">
           <label class="label"><span class="label-text">Address</span></label>
@@ -195,4 +237,6 @@
     }
   }
 </script>
+<script src="{% static 'js/nrc_data.js' %}"></script>
+<script src="{% static 'js/nrc_widget.js' %}"></script>
 {% endblock %}

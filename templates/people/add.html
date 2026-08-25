@@ -1,4 +1,4 @@
-{% extends 'base.html' %} {% block title %} Add New Student | Secure Voting System {% endblock %} {% block content %}
+{% extends 'base.html' %} {% load static %} {% block title %} Add New Student | Secure Voting System {% endblock %} {% block content %}
 <div class="max-w-4xl mx-auto">
   <div class="text-sm breadcrumbs mb-6">
     <ul>
@@ -52,28 +52,72 @@
                 >Father's Name</span
               ></label
             >
-            <input
-              type="text"
-              name="father_name"
-              placeholder="Enter father's name"
-              class="input input-bordered w-full focus:input-primary"
-              required
-            />
-          </div>
+              <input
+                type="text"
+                name="father_name"
+                placeholder="Enter father's name"
+                class="input input-bordered w-full focus:input-primary"
+                required
+              />
+            </div>
 
-          <div class="form-control w-full">
-            <label class="label"
-              ><span class="label-text font-semibold"
-                >NRC / Identity Number</span
-              ></label
+            <div class="form-control w-full">
+              <label class="label"
+                ><span class="label-text font-semibold">Date of Birth</span></label
+              >
+              <input
+                type="date"
+                name="date_of_birth"
+                value="{{ form_data.date_of_birth|default:'' }}"
+                max="{{ dob_max|date:'Y-m-d' }}"
+                class="input input-bordered w-full focus:input-primary"
+              />
+            </div>
+
+            <div class="form-control w-full">
+              <label class="label"
+                ><span class="label-text font-semibold"
+                  >NRC / Identity Number</span
+                ></label
+              >
+            <div
+              id="nrc-widget"
+              data-nrc-widget
+              data-state="{{ form_data.state|default:'' }}"
+              data-district="{{ form_data.district|default:'' }}"
+              data-number="{{ form_data.number|default:'' }}"
+              class="flex flex-wrap items-end gap-2"
             >
-            <input
-              type="text"
-              name="nrc"
-              placeholder="12/YAKANA(N)123456"
-              class="input input-bordered w-full focus:input-primary"
-              required
-            />
+              <select
+                data-nrc-state
+                class="select select-bordered focus:select-primary"
+                required
+              ></select>
+              <span class="pb-2 text-lg opacity-60">/</span>
+              <select
+                data-nrc-district
+                class="select select-bordered focus:select-primary"
+                disabled
+                required
+              ></select>
+              <span class="pb-2 text-lg opacity-60">(N)</span>
+              <input
+                data-nrc-number
+                type="text"
+                inputmode="numeric"
+                maxlength="6"
+                placeholder="123456"
+                value="{{ form_data.number|default:'' }}"
+                class="input input-bordered w-40 focus:input-primary"
+                required
+              />
+              <input type="hidden" name="nrc" data-nrc-hidden />
+            </div>
+            <div class="mt-2 text-sm opacity-70">
+              Preview:
+              <span data-nrc-preview class="font-mono text-primary"></span>
+            </div>
+            <p data-nrc-error class="text-error text-xs mt-1 hidden"></p>
           </div>
         </div>
 
@@ -219,4 +263,6 @@
     }
   }
 </script>
+<script src="{% static 'js/nrc_data.js' %}"></script>
+<script src="{% static 'js/nrc_widget.js' %}"></script>
 {% endblock %}

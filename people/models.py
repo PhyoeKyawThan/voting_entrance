@@ -27,8 +27,9 @@ class People(models.Model):
         blank=True,
         null=True
     )
-    nrc = models.CharField(max_length=100)
+    nrc = models.CharField(max_length=100, unique=True)
     father_name = models.CharField(max_length=50)
+    date_of_birth = models.DateField(null=True, blank=True)
     address = models.CharField(max_length=255)
     register_date = models.DateTimeField(auto_now_add=True)
 

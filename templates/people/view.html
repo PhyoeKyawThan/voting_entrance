@@ -40,6 +40,10 @@
                             <p class="text-xs font-bold text-primary uppercase">Father's Name</p>
                             <p class="font-medium">{{ person.father_name }}</p>
                         </div>
+                        <div>
+                            <p class="text-xs font-bold text-primary uppercase">Date of Birth</p>
+                            <p class="font-medium">{{ person.date_of_birth|default:"—" }}</p>
+                        </div>
                         <div class="md:col-span-2">
                             <p class="text-xs font-bold text-primary uppercase">Permanent Address</p>
                             <p class="font-medium">{{ person.address }}</p>
